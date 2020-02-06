@@ -1,0 +1,94 @@
+---
+title: "Student's t model"
+author: "Hedibert Freitas Lopes"
+date: "1/21/2020"
+output:
+pdf_document: default
+---
+```{r ClearVars, include=FALSE}
+rm(list = ls())
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Student's $t$ model
+Assume that $y_1,\ldots,y_n$ are iid $t_\nu(0,\sigma^2)$, for known number of degrees of freedom $\nu$, and that the prior of $\sigma^2$ is inverse-gamma with parameters $a$ and $b$, i.e. $\sigma^2 \sim IG(a,b)$.  Therefore,
+$$
+p(\sigma^2|y_1,\ldots,y_n,\nu) \propto p(\sigma^2|a,b)\prod_{t=1}^n p(y_i|\sigma^2,\nu),
+$$
+is of unknown form.
+
+# Simulating some artificial data
+```{r fig.width=12, fig.height=7}
+set.seed(2325)
+n   = 100
+sig = 2
+nu  = 4
+y   = sig*rt(n,df=nu)
+boxplot(y,horizontal=TRUE)
+```
+
+# SIR to draw from $p(\sigma^2|y_1,\ldots,y_n,\nu)$
+Below we implement SIR by sampling from a highly inefficient candidate density, $U(0,100)$.
+```{r fig.width=12, fig.height=7}
+# declara uma funcao
+dt.hedi = function(sig2){
+  prod(dt(y/sqrt(sig2), df=nu)/sqrt(sig2))
+}
+set.seed(4321)
+M = 10000
+sig2.t = runif(M,0,100)
+
+w = rep(0,M)
+for (i in 1:M){
+  w[i] = dt.hedi(sig2.t[i])
+}
+sig2 = sample(sig2.t, size=M, replace=T, prob=w)
+hist(sig2,xlab=expression(sigma^2),prob=TRUE)
+abline(v=sig^2,col=2,lwd=3)
+mean(sig2)
+```
+
+# Computing marginal likelihoods (aka normalizing constants, aka prior predictives)
+Let us know compute 
+$$
+p(y_1,...,y_n|\nu) = \int p(y_1,\ldots,y_n|\sigma^2,\nu)p(\sigma^2|a,b)d\sigma^2
+$$
+for $\nu \in \{1,\ldots,k\}$ for a large $k$, say $k=100$.  We will approximate the integral by simple Monte Carlo Integration by noticing that 
+$$
+p(y_1,\ldots,y_n|\nu) \approx \frac{1}{M} \sum_{i=1}^M p(y_1,\ldots,y_n|\sigma^{2(i)},\nu),
+$$
+where $\{\sigma^{2(i)}\}_{i=1}^M$ are draws from $p(\sigma^2|a,b)$, the prior for $\sigma^2$ with $a=b=3/2$.
+
+```{r fig.width=12, fig.height=7}
+dt.hedi = function(sig2,nu){
+  sum(dt(y/sqrt(sig2),df=nu,log=TRUE)-0.5*log(sig2))
+}
+
+M = 1000
+sig2 = 1/rgamma(M,3.5,3.5)
+nu.max = 100
+nus = 1:nu.max
+logpred = matrix(0,M,nu.max)
+for (j in 1:M)
+for (i in 1:nu.max)
+  logpred[j,i] = dt.hedi(sig2[j],nus[i])
+A = max(logpred)
+logpred1 = logpred-A
+max(logpred1)
+pred1 = exp(logpred1)
+
+logpred1 = log(apply(pred1,2,sum))+ A -log(M)
+plot(nus,logpred1,ylab="Log predictive",xlab=expression(nu))
+abline(v=nu,col=2,lwd=3)
+```
+
+
+
+
+
+
+
+
+
