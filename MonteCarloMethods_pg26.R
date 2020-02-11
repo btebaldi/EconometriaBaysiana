@@ -34,8 +34,9 @@ z = rbinom(n, 1, 0.2)
 y = rnorm(n,mu[z+1],sd[z+1])
 
 par(mfrow=c(1,1))
-hist(y,prob=TRUE,breaks=seq(-10,20,length=30),main="")
-lines(ys,0.8*dnorm(ys,mu1,sd1)+0.2*dnorm(ys,mu2,sd2),col=2)
+hist(y,prob=TRUE,breaks=seq(-10,20,length=50),main="")
+lines(ys, p_mixt(ys, mu1, mu2, sd1, sd2),col=2)
+# lines(ys, 0.8*dnorm(ys,mu1,sd1)+0.2*dnorm(ys,mu2,sd2),col=2)
 
 # Posterior of (mu1,mu2) (contour plot)
 N = 100
@@ -56,7 +57,7 @@ mu1.d = rnorm(M)
 mu2.d = rnorm(M)
 w = rep(0,M)
 for (i in 1:M)
-  w[i] = dmixt(y,mu1.d[i],mu2.d[i])
+  w[i] = dmixt(y, mu1.d[i], mu2.d[i])
 ind = sample(1:M,size=M,replace=TRUE,prob=w)
 mu1.d = mu1.d[ind]
 mu2.d = mu2.d[ind]

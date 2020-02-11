@@ -1,5 +1,3 @@
-rm(list = ls())
-
 ####################################################################################
 #
 #
@@ -53,6 +51,9 @@ rm(list = ls())
 #
 ####################################################################################
 
+# clear
+rm(list = ls())
+
 data = read.table("http://hedibert.org/wp-content/uploads/2020/01/mroz-data.txt",header=TRUE)
 # attach(data)
 # detach(data)
@@ -62,7 +63,7 @@ x = data$AX
 namex = "Years of previous experience"
 namey = "Hours of work"
 
-loglike = function(alpha,beta,sigma){
+loglike = function(alpha, beta, sigma){
   sum(dnorm(y[y>0],alpha+beta*x[y>0],sigma,log=TRUE))+
     sum(pnorm(-(alpha+beta*x[y==0])/sigma,log=TRUE))
 }
@@ -71,12 +72,15 @@ minusloglike = function(theta){
   alpha = theta[1]
   beta = theta[2]
   sigma = exp(theta[3])
-  -sum(dnorm(y[y>0],alpha+beta*x[y>0],sigma,log=TRUE))-
-    sum(pnorm(-(alpha+beta*x[y==0])/sigma,log=TRUE))
+  ret = -loglike(alpha, beta, sigma)
+  
+  return(ret)
+  # -sum(dnorm(y[y>0],alpha+beta*x[y>0],sigma,log=TRUE))-
+  #   sum(pnorm(-(alpha+beta*x[y==0])/sigma,log=TRUE))
 }
 
-theta = c(900,30,log(800))
-theta.mle = nlm(minusloglike,theta)$estimate
+theta = c(900, 30, log(800))
+theta.mle = nlm(minusloglike, theta)$estimate
 alpha.mle = theta.mle[1]
 beta.mle = theta.mle[2]
 sig.mle = exp(theta.mle[3])
@@ -85,8 +89,9 @@ par(mfrow=c(1,1))
 plot(x,y,xlab=namex,ylab=namey)
 abline(lm(y~x),col=2,lwd=2)
 abline(lm(y[y>0]~x[y>0]),col=3,lwd=2)
-points(x[y==0],y[y==0],pch=16)
-points(x,alpha.mle+beta.mle*x,col=4,pch=16)
+points(x[y==0],y[y==0], pch=16)
+points(x,alpha.mle+beta.mle*x,col=4, pch=16)
+abline(alpha.mle, beta.mle,col=4,pch=16)
 legend("topright",legend=c(
   paste("corr(x,y)=",round(cor(x,y),3),sep=""),
   paste("corr(x[y>0],y[y>0])=",round(cor(x[y>0],y[y>0]),3),sep=""),
@@ -103,17 +108,20 @@ alphas = rnorm(M, alpha.mle, 1000)
 betas = rnorm(M, beta.mle, 100)
 sigs = sqrt(1/rgamma(M,5/2,5*(1000^2)/2))
 
-
+# Inicializa vetor w
 w = rep(0,M)
 
-# DUVIDA: ESTAMOS USANDO UMA PRIORI DE VARIANCIA MAIOR????
+
 for (i in 1:M)
   w[i] = loglike(alphas[i],betas[i],sigs[i])+
   dnorm(alphas[i],-429.995052,10000,log=TRUE)+dnorm(betas[i],70.794740,1000,log=TRUE)-
   dnorm(alphas[i],-429.995052,1000, log=TRUE)-dnorm(betas[i],70.794740,100,log=TRUE)
 w = exp(w-max(w))
-ind = sample(1:M,size=M,replace=TRUE,prob=w)
 
+# Amostragem do indice
+ind = sample(1:M, size=M, replace=TRUE,prob=w)
+
+# baseano no indice, busca-se alpha, beta e sigma
 alphas1 = alphas[ind]
 betas1 = betas[ind]
 sigs1 = sigs[ind]
@@ -126,11 +134,11 @@ lines(density(betas),col=2)
 
 
 # AQUI DEVERIA SER ALPHAS1 E BETAS 1 NAO????
-alpha.bayes = mean(alphas)
-beta.bayes = mean(betas)
+alpha.bayes = mean(alphas1)
+beta.bayes = mean(betas1)
 
 
-x11()
+# x11()
 par(mfrow=c(1,1))
 plot(x,y,xlab=namex,ylab=namey)
 abline(lm(y~x),col=2,lwd=2)
@@ -141,6 +149,6 @@ legend("topright",legend=c(
   paste("corr(x[y>0],y[y>0])=",round(cor(x[y>0],y[y>0]),3),sep="")),col=2:3,lwd=2)
 points(x,alpha.mle+beta.mle*x,col=4,pch=16)
 points(x,alpha.bayes+beta.bayes*x,col=6,pch=16)
-points(x,mean(alphas1)+mean(betas1)*x,col=7,pch=16)
+# points(x,mean(alphas1)+mean(betas1)*x,col=7,pch=16)
 
 
