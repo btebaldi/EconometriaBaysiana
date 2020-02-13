@@ -54,10 +54,10 @@ $$
 p\left(y | X, \beta, \sigma^{2}, \{\lambda_i\}\right) 
 &\propto \exp \left\{-\frac{1}{2 \sigma^{2}} \sum_{i=1}^{n} \hat\epsilon_i^2 \right\} \\
 &\propto \exp \left\{-\frac{1}{2 \sigma^{2}}\left[y^{T} y-2 \beta^{T} X^{T}\Lambda^{-1} y+\beta^{T} X^{T}\Lambda^{-1} X \beta\right]\right\} \\
-p\left(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\right) &\propto p\left(y | X, \beta, \sigma^{2}\right) \times p(\boldsymbol{\beta}) \\
-&\propto \exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} X^{T}\Lambda^{-1} y +\beta^{T} X^{T}\Lambda^{-1} X \beta \right)-\frac{1}{2}\left(-2 \boldsymbol{\beta}^{T} V_{0}^{-1} \beta_{0}+\boldsymbol{\beta}^{T} V_{0}^{-1} \beta\right)\right\} \\
+p\left(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\right) &\propto p\left(y | X, \beta, \sigma^{2}\right) \times p(\beta) \\
+&\propto \exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} X^{T}\Lambda^{-1} y +\beta^{T} X^{T}\Lambda^{-1} X \beta \right)-\frac{1}{2}\left(-2 \beta^{T} V_{0}^{-1} \beta_{0}+\beta^{T} V_{0}^{-1} \beta\right)\right\} \\
 &\propto 
-\exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} (X^{T}\Lambda^{-1} y +V_{0}^{-1} \boldsymbol{\beta}_{0})+ \beta^{T} (X^{T}\Lambda^{-1} X +V_{0}^{-1} ) \beta \right)
+\exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} (X^{T}\Lambda^{-1} y +V_{0}^{-1} \beta_{0})+ \beta^{T} (X^{T}\Lambda^{-1} X +V_{0}^{-1} ) \beta \right)
 \right\}
 \end{align}
 $$
@@ -94,6 +94,18 @@ $$
 &\nu_1 = \nu_0 + n \qquad \nu_1\sigma_1^2 = \nu_0\sigma_0^2 + (y - X\beta)^T\Lambda^{-1}(y-x\beta)
 \end{align}
 $$
+Lastly we have that
+$$
+\begin{align}
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto p\left( y_{i}| \lambda_{i}, \beta, \sigma^{2}, x_{i}\right) p(\lambda_{i}) \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \frac{1}{\sqrt{2\pi \sigma^2 \lambda} }  
+\exp \left\{-\frac{1}{2}\left(\left(y_{i}-x_{i}^{T} \beta\right)^{2} \sigma^{-2}\lambda_{i}^{-1}\right)\right\} \exp \left\{-0.5 \lambda_{i}\right\} \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \lambda^{-1 / 2} \exp \left\{-0.5 \lambda_{i}\right\} 
+\exp \left\{-0.5\left(\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\} \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \lambda^{-1 / 2} \exp \left\{-0.5\left(\lambda_{i}+\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\}
+\end{align}
+$$
+
 ## Including Plots
 
 You can also embed plots, for example:
