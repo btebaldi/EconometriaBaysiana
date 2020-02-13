@@ -18,9 +18,6 @@ where $x_i = (1, x_{i1}, \dots, x_{iq})'$ is a p-dimensional vector of regressor
 characteristics) and the following hierarchical prior for the scale-mixing variables $\lambda_i$:
 $\lambda_1, \dots, \lambda_n$ iid Exponential(1/2):
 
-Recall that
-\[	f(\lambda) = \lambda e^{{-\lambda x}}\]
-
 ### PART A)
 
 $$\begin{aligned}
@@ -47,24 +44,20 @@ $$
 
 ###  PART B)
 
-Let $y = (y_1, \dots, y_n)'$ and $X = (x_1, \dots, x_n)'$. Where we have the the following independent priors for $\beta \sim N(\beta_0, V_0)$ and $\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)$.
-
-where $\mathcal{D} = \{y;X\}$ is the data;
-
-Also let
+Let $y = (y_1, \dots, y_n)'$ and $X = (x_1, \dots, x_n)'$. Where we have the the following independent priors for $\beta \sim N(\beta_0, V_0)$ and $\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)$. Also let $\mathcal{D} = \{y;X\}$, and $\Lambda$ detnoted as follows
 $$
 \Lambda  = \begin{bmatrix}\lambda_1 & 0 & \dots & 0 \\ 0 & \lambda_2 & \dots & 0 \\ 0 & \vdots & \ddots & 0 \\ 0 & 0 & 0 & \lambda_n \end{bmatrix}
 $$
-If $\beta \sim N(\beta_0, V_0)$, then
+We know that traditional GLS have that $\beta = (X^T\Lambda^{-1}X)^{-1}X^T\Lambda^{-1}y$. If $\beta \sim N(\beta_0, V_0)$, then
 $$
 \begin{align}
 p\left(y | X, \beta, \sigma^{2}, \{\lambda_i\}\right) 
-&\propto \exp \left\{-\frac{1}{2 \sigma^{2}} \sum_{i=1}^{n} \hat\epsilon_i \right\} \\
-&\propto \exp \left\{-\frac{1}{2 \sigma^{2}}\left[\boldsymbol{y}^{T} \boldsymbol{y}-2 \boldsymbol{\beta}^{T} \mathbf{X}^{T}\Lambda^{-1} \boldsymbol{y}+\boldsymbol{\beta}^{T} \mathbf{X}^{T}\Lambda^{-1} \mathbf{X} \boldsymbol{\beta}\right]\right\} \\
-p\left(\boldsymbol{\beta} | \{\lambda_i\}, \sigma^2, \mathcal{D}\right) &\propto p\left(\boldsymbol{y} | \mathbf{X}, \boldsymbol{\beta}, \sigma^{2}\right) \times p(\boldsymbol{\beta}) \\
-&\propto \exp \left\{-\frac{1}{2\sigma^2}\left(-2 \boldsymbol{\beta}^{T} \mathbf{X}^{T}\Lambda^{-1} \boldsymbol{y} +\boldsymbol{\beta}^{T} \mathbf{X}^{T}\Lambda^{-1} \mathbf{X} \boldsymbol{\beta} \right)-\frac{1}{2}\left(-2 \boldsymbol{\beta}^{T} V_{0}^{-1} \boldsymbol{\beta}_{0}+\boldsymbol{\beta}^{T} V_{0}^{-1} \boldsymbol{\beta}\right)\right\} \\
+&\propto \exp \left\{-\frac{1}{2 \sigma^{2}} \sum_{i=1}^{n} \hat\epsilon_i^2 \right\} \\
+&\propto \exp \left\{-\frac{1}{2 \sigma^{2}}\left[y^{T} y-2 \beta^{T} X^{T}\Lambda^{-1} y+\beta^{T} X^{T}\Lambda^{-1} X \beta\right]\right\} \\
+p\left(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\right) &\propto p\left(y | X, \beta, \sigma^{2}\right) \times p(\boldsymbol{\beta}) \\
+&\propto \exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} X^{T}\Lambda^{-1} y +\beta^{T} X^{T}\Lambda^{-1} X \beta \right)-\frac{1}{2}\left(-2 \boldsymbol{\beta}^{T} V_{0}^{-1} \beta_{0}+\boldsymbol{\beta}^{T} V_{0}^{-1} \beta\right)\right\} \\
 &\propto 
-\exp \left\{-\frac{1}{2\sigma^2}\left(-2 \boldsymbol{\beta}^{T} (\mathbf{X}^{T}\Lambda^{-1} \boldsymbol{y} +V_{0}^{-1} \boldsymbol{\beta}_{0})+\boldsymbol{\beta}^{T} (\mathbf{X}^{T}\Lambda^{-1} \mathbf{X} +V_{0}^{-1} ) \boldsymbol{\beta} \right)
+\exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} (X^{T}\Lambda^{-1} y +V_{0}^{-1} \boldsymbol{\beta}_{0})+ \beta^{T} (X^{T}\Lambda^{-1} X +V_{0}^{-1} ) \beta \right)
 \right\}
 \end{align}
 $$
@@ -80,6 +73,27 @@ $$
 V_{1}=\left(X^{\prime} \Lambda^{-1} X / \sigma^{2}+V_{0}^{-1}\right)^{-1} \qquad \beta_{1}=V_{1}\left(X^{\prime} \Lambda^{-1} y+V_{0}^{-1} \beta_{0}\right)
 $$
 
+As in most normal sampling problems, the semiconjugate prior distribution for $\sigma^2$ is an inverse-gamma distribution.
+Letting $ \gamma = 1/\sigma^2$ be the measurement precision, this implies that $\gamma \sim G\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)$ then 
+$$
+\begin{align}
+p(\gamma | \mathcal{D}, \beta) & \propto p(\gamma) p(y | X, \beta, \gamma) \\
+& \propto\left[\gamma^{\nu_{0} / 2-1} \exp \left\{-\gamma \times \frac{ \nu_{0} \sigma_{0}^{2}}{2}\right\}\right] \times\left[\gamma^{\frac{n}{2}} \exp \left\{- \frac{\gamma  }{2} \sum_{i=1}^{n} \hat\epsilon_i^2\right\}\right] \\
+& \propto\gamma^{\left(\nu_{0}+n\right) / 2-1} \exp \left\{-\gamma\left[\nu_{0} \sigma_{0}^{2}+\sum_{i=1}^{n} \hat\epsilon_i^2\right] / 2\right\}
+\end{align}
+$$
+which we recognize as a gamma density, so that 
+$$
+\sigma^2| \Lambda, \mathcal{D}, \beta \sim IG\left(\frac{\nu_0 + n}{2}, \frac{\nu_0 \sigma_0^2 + \sum_{i=1}^{n} \hat\epsilon_i^2}{2}\right)
+$$
+Recall that $\sum_{i=1}^{n} \hat\epsilon_i^2 = (y - X\beta)^T\Lambda^{-1}(y-x\beta)$
+$$
+\begin{align}
+\sigma^2| \Lambda, \mathcal{D}, \beta &\sim IG\left(\frac{\nu_0 + n}{2}, \frac{\nu_0 \sigma_0^2 + (y - X\beta)^T\Lambda^{-1}(y-x\beta)}{2}\right) \\
+\sigma^2| \Lambda, \mathcal{D}, \beta &\sim IG\left(\frac{\nu_1}{2}, \frac{\nu_1 \sigma_1^2}{2}\right) \\
+&\nu_1 = \nu_0 + n \qquad \nu_1\sigma_1^2 = \nu_0\sigma_0^2 + (y - X\beta)^T\Lambda^{-1}(y-x\beta)
+\end{align}
+$$
 ## Including Plots
 
 You can also embed plots, for example:

@@ -391,17 +391,21 @@ p\left(\epsilon_{i} | \sigma^{2}\right)=\left(2 \pi \sigma^{2}\right)^{-1 / 2} \
 </div>
 <div id="part-b" class="section level3">
 <h3>PART B)</h3>
-<p>%} \ %{={<sup>{T}(<em>{0}^{-1} </em>{0}+</sup>{T}  / ^{2})- ^{T}(_{0}<sup>{-1}+</sup>{T}  / ^{2}) }}</p>
-<p>\</p>
-<p><span class="math display">\[
-\Lambda  = \begin{bmatrix}a \\b \end{bmatrix}
-\]</span> If <span class="math inline">\(\beta \sim N(\beta_0, V_0)\)</span>, then <span class="math display">\[
+<p>Let <span class="math inline">\(y = (y_1, \dots, y_n)&#39;\)</span> and <span class="math inline">\(X = (x_1, \dots, x_n)&#39;\)</span>. Where we have the the following independent priors for <span class="math inline">\(\beta \sim N(\beta_0, V_0)\)</span> and <span class="math inline">\(\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)\)</span>.</p>
+<p>where <span class="math inline">\(\mathcal{D} = \{y;X\}\)</span> is the data;</p>
+<p>Also let <span class="math display">\[
+\Lambda  = \begin{bmatrix}\lambda_1 &amp; 0 &amp; \dots &amp; 0 \\ 0 &amp; \lambda_2 &amp; \dots &amp; 0 \\ 0 &amp; \vdots &amp; \ddots &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; \lambda_n \end{bmatrix}
+\]</span> We know that traditional GLS have that <span class="math inline">\(\beta = (X^T\Lambda^{-1}X)^{-1}X^T\Lambda^{-1}y\)</span>. If <span class="math inline">\(\beta \sim N(\beta_0, V_0)\)</span>, then <span class="math display">\[
 \begin{align}
-p\left(\boldsymbol{y} | \mathbf{X}, \boldsymbol{\beta}, \sigma^{2}\right) 
+p\left(y | X, \beta, \sigma^{2}, \{\lambda_i\}\right) 
 &amp;\propto \exp \left\{-\frac{1}{2 \sigma^{2}} \sum_{i=1}^{n} \hat\epsilon_i \right\} \\
-&amp;\propto \exp \left\{-\frac{1}{2 \sigma^{2}}\left[\boldsymbol{y}^{T} \boldsymbol{y}-2 \boldsymbol{\beta}^{T} \mathbf{X}^{T}\Lambda \boldsymbol{y}+\boldsymbol{\beta}^{T} \mathbf{X}^{T}\Lambda \mathbf{X} \boldsymbol{\beta}\right]\right\} \\
-p\left(\boldsymbol{\beta} | \boldsymbol{y}, \mathbf{X}, \sigma^{2}\right) &amp;\propto p\left(\boldsymbol{y} | \mathbf{X}, \boldsymbol{\beta}, \sigma^{2}\right) \times p(\boldsymbol{\beta}) \\
-&amp;\propto \exp \left\{-\frac{1}{2\sigma^2}\left(-2 \boldsymbol{\beta}^{T} \mathbf{X}^{T}\Lambda \boldsymbol{y} +\boldsymbol{\beta}^{T} \mathbf{X}^{T}\Lambda \mathbf{X} \boldsymbol{\beta} \right)-\frac{1}{2}\left(-2 \boldsymbol{\beta}^{T} V_{0}^{-1} \boldsymbol{\beta}_{0}+\boldsymbol{\beta}^{T} V_{0}^{-1} \boldsymbol{\beta}\right)\right\}
+&amp;\propto \exp \left\{-\frac{1}{2 \sigma^{2}}\left[y^{T} y-2 \beta^{T} X^{T}\Lambda^{-1} y+\beta^{T} X^{T}\Lambda^{-1} X \beta\right]\right\} \\
+p\left(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\right) &amp;\propto p\left(y | X, \beta, \sigma^{2}\right) \times p(\boldsymbol{\beta}) \\
+&amp;\propto \exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} X^{T}\Lambda^{-1} y +\beta^{T} X^{T}\Lambda^{-1} X \beta \right)-\frac{1}{2}\left(-2 \boldsymbol{\beta}^{T} V_{0}^{-1} \beta_{0}+\boldsymbol{\beta}^{T} V_{0}^{-1} \beta\right)\right\} \\
+&amp;\propto 
+\exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} (X^{T}\Lambda^{-1} y +V_{0}^{-1} \boldsymbol{\beta}_{0})+ \beta^{T} (X^{T}\Lambda^{-1} X +V_{0}^{-1} ) \beta \right)
+\right\}
+\end{align}
 \]</span> we recognize this as being proportional to a multivariate normal density, with <span class="math display">\[
 \begin{align}
 \beta | \{\lambda_i\}, \sigma^2, \mathcal{D} \sim N(\beta_1, V_1) \\
