@@ -370,7 +370,6 @@ summary {
 <div id="r-markdown" class="section level2">
 <h2>R Markdown</h2>
 <p>Consider the regression model <span class="math inline">\(y_i = x_i&#39;\beta + \epsilon_i0\)</span> <span class="math inline">\(\epsilon_i | \lambda_i ,\sigma^2 \sim N(0, \lambda_i\sigma^2)\)</span> where <span class="math inline">\(x_i = (1, x_{i1}, \dots, x_{iq})&#39;\)</span> is a p-dimensional vector of regressors (constant plus q attributes or characteristics) and the following hierarchical prior for the scale-mixing variables <span class="math inline">\(\lambda_i\)</span>: <span class="math inline">\(\lambda_1, \dots, \lambda_n\)</span> iid Exponential(1/2):</p>
-<p>Recall that <span class="math display">\[  f(\lambda) = \lambda e^{{-\lambda x}}\]</span></p>
 <div id="part-a" class="section level3">
 <h3>PART A)</h3>
 <p><span class="math display">\[\begin{aligned}
@@ -391,19 +390,17 @@ p\left(\epsilon_{i} | \sigma^{2}\right)=\left(2 \pi \sigma^{2}\right)^{-1 / 2} \
 </div>
 <div id="part-b" class="section level3">
 <h3>PART B)</h3>
-<p>Let <span class="math inline">\(y = (y_1, \dots, y_n)&#39;\)</span> and <span class="math inline">\(X = (x_1, \dots, x_n)&#39;\)</span>. Where we have the the following independent priors for <span class="math inline">\(\beta \sim N(\beta_0, V_0)\)</span> and <span class="math inline">\(\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)\)</span>.</p>
-<p>where <span class="math inline">\(\mathcal{D} = \{y;X\}\)</span> is the data;</p>
-<p>Also let <span class="math display">\[
+<p>Let <span class="math inline">\(y = (y_1, \dots, y_n)&#39;\)</span> and <span class="math inline">\(X = (x_1, \dots, x_n)&#39;\)</span>. Where we have the the following independent priors for <span class="math inline">\(\beta \sim N(\beta_0, V_0)\)</span> and <span class="math inline">\(\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)\)</span>. Also let <span class="math inline">\(\mathcal{D} = \{y;X\}\)</span>, and <span class="math inline">\(\Lambda\)</span> detnoted as follows <span class="math display">\[
 \Lambda  = \begin{bmatrix}\lambda_1 &amp; 0 &amp; \dots &amp; 0 \\ 0 &amp; \lambda_2 &amp; \dots &amp; 0 \\ 0 &amp; \vdots &amp; \ddots &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; \lambda_n \end{bmatrix}
 \]</span> We know that traditional GLS have that <span class="math inline">\(\beta = (X^T\Lambda^{-1}X)^{-1}X^T\Lambda^{-1}y\)</span>. If <span class="math inline">\(\beta \sim N(\beta_0, V_0)\)</span>, then <span class="math display">\[
 \begin{align}
 p\left(y | X, \beta, \sigma^{2}, \{\lambda_i\}\right) 
-&amp;\propto \exp \left\{-\frac{1}{2 \sigma^{2}} \sum_{i=1}^{n} \hat\epsilon_i \right\} \\
+&amp;\propto \exp \left\{-\frac{1}{2 \sigma^{2}} \sum_{i=1}^{n} \hat\epsilon_i^2 \right\} \\
 &amp;\propto \exp \left\{-\frac{1}{2 \sigma^{2}}\left[y^{T} y-2 \beta^{T} X^{T}\Lambda^{-1} y+\beta^{T} X^{T}\Lambda^{-1} X \beta\right]\right\} \\
-p\left(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\right) &amp;\propto p\left(y | X, \beta, \sigma^{2}\right) \times p(\boldsymbol{\beta}) \\
-&amp;\propto \exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} X^{T}\Lambda^{-1} y +\beta^{T} X^{T}\Lambda^{-1} X \beta \right)-\frac{1}{2}\left(-2 \boldsymbol{\beta}^{T} V_{0}^{-1} \beta_{0}+\boldsymbol{\beta}^{T} V_{0}^{-1} \beta\right)\right\} \\
+p\left(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\right) &amp;\propto p\left(y | X, \beta, \sigma^{2}\right) \times p(\beta) \\
+&amp;\propto \exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} X^{T}\Lambda^{-1} y +\beta^{T} X^{T}\Lambda^{-1} X \beta \right)-\frac{1}{2}\left(-2 \beta^{T} V_{0}^{-1} \beta_{0}+\beta^{T} V_{0}^{-1} \beta\right)\right\} \\
 &amp;\propto 
-\exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} (X^{T}\Lambda^{-1} y +V_{0}^{-1} \boldsymbol{\beta}_{0})+ \beta^{T} (X^{T}\Lambda^{-1} X +V_{0}^{-1} ) \beta \right)
+\exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} (X^{T}\Lambda^{-1} y +V_{0}^{-1} \beta_{0})+ \beta^{T} (X^{T}\Lambda^{-1} X +V_{0}^{-1} ) \beta \right)
 \right\}
 \end{align}
 \]</span> we recognize this as being proportional to a multivariate normal density, with <span class="math display">\[
@@ -414,6 +411,30 @@ p\left(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\right) &amp;\propto p\left(y
 \]</span></p>
 <p><span class="math display">\[
 V_{1}=\left(X^{\prime} \Lambda^{-1} X / \sigma^{2}+V_{0}^{-1}\right)^{-1} \qquad \beta_{1}=V_{1}\left(X^{\prime} \Lambda^{-1} y+V_{0}^{-1} \beta_{0}\right)
+\]</span></p>
+<p>As in most normal sampling problems, the semiconjugate prior distribution for <span class="math inline">\(\sigma^2\)</span> is an inverse-gamma distribution. Letting $ = 1/^2$ be the measurement precision, this implies that <span class="math inline">\(\gamma \sim G\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)\)</span> then <span class="math display">\[
+\begin{align}
+p(\gamma | \mathcal{D}, \beta) &amp; \propto p(\gamma) p(y | X, \beta, \gamma) \\
+&amp; \propto\left[\gamma^{\nu_{0} / 2-1} \exp \left\{-\gamma \times \frac{ \nu_{0} \sigma_{0}^{2}}{2}\right\}\right] \times\left[\gamma^{\frac{n}{2}} \exp \left\{- \frac{\gamma  }{2} \sum_{i=1}^{n} \hat\epsilon_i^2\right\}\right] \\
+&amp; \propto\gamma^{\left(\nu_{0}+n\right) / 2-1} \exp \left\{-\gamma\left[\nu_{0} \sigma_{0}^{2}+\sum_{i=1}^{n} \hat\epsilon_i^2\right] / 2\right\}
+\end{align}
+\]</span> which we recognize as a gamma density, so that <span class="math display">\[
+\sigma^2| \Lambda, \mathcal{D}, \beta \sim IG\left(\frac{\nu_0 + n}{2}, \frac{\nu_0 \sigma_0^2 + \sum_{i=1}^{n} \hat\epsilon_i^2}{2}\right)
+\]</span> Recall that <span class="math inline">\(\sum_{i=1}^{n} \hat\epsilon_i^2 = (y - X\beta)^T\Lambda^{-1}(y-x\beta)\)</span> <span class="math display">\[
+\begin{align}
+\sigma^2| \Lambda, \mathcal{D}, \beta &amp;\sim IG\left(\frac{\nu_0 + n}{2}, \frac{\nu_0 \sigma_0^2 + (y - X\beta)^T\Lambda^{-1}(y-x\beta)}{2}\right) \\
+\sigma^2| \Lambda, \mathcal{D}, \beta &amp;\sim IG\left(\frac{\nu_1}{2}, \frac{\nu_1 \sigma_1^2}{2}\right) \\
+&amp;\nu_1 = \nu_0 + n \qquad \nu_1\sigma_1^2 = \nu_0\sigma_0^2 + (y - X\beta)^T\Lambda^{-1}(y-x\beta)
+\end{align}
+\]</span> Lastly we have that <span class="math display">\[
+\begin{align}
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto p\left( y_{i}| \lambda_{i}, \beta, \sigma^{2}, x_{i}\right) p(\lambda_{i}) \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \frac{1}{\sqrt{2\pi \sigma^2 \lambda} }  
+\exp \left\{-\frac{1}{2}\left(\left(y_{i}-x_{i}^{T} \beta\right)^{2} \sigma^{-2}\lambda_{i}^{-1}\right)\right\} \exp \left\{-0.5 \lambda_{i}\right\} \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \lambda^{-1 / 2} \exp \left\{-0.5 \lambda_{i}\right\} 
+\exp \left\{-0.5\left(\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\} \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \lambda^{-1 / 2} \exp \left\{-0.5\left(\lambda_{i}+\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\}
+\end{align}
 \]</span></p>
 </div>
 </div>
