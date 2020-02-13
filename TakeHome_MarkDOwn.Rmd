@@ -69,12 +69,8 @@ $$
 \end{align}
 $$
 
-$$
-V_{1}=\left(X^{\prime} \Lambda^{-1} X / \sigma^{2}+V_{0}^{-1}\right)^{-1} \qquad \beta_{1}=V_{1}\left(X^{\prime} \Lambda^{-1} y+V_{0}^{-1} \beta_{0}\right)
-$$
-
 As in most normal sampling problems, the semiconjugate prior distribution for $\sigma^2$ is an inverse-gamma distribution.
-Letting $ \gamma = 1/\sigma^2$ be the measurement precision, this implies that $\gamma \sim G\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)$ then 
+Letting $\gamma = 1/\sigma^2$ be the measurement precision, this implies that $\gamma \sim G\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)$ then 
 $$
 \begin{align}
 p(\gamma | \mathcal{D}, \beta) & \propto p(\gamma) p(y | X, \beta, \gamma) \\
@@ -107,11 +103,3 @@ p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \lambda^{-1 
 $$
 
 ## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
