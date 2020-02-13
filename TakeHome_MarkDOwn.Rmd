@@ -1,0 +1,56 @@
+---
+title: "Econometria Baysiana - Take Home Exam"
+Auhtor: "Bruno Barbosa"
+date: "13/02/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Consider the regression model
+$y_i = x_i'\beta + \epsilon_i0$
+$\epsilon_i | \lambda_i ,\sigma^2 \sim N(0, \lambda_i\sigma^2)$
+where $x_i = (1, x_{i1}, \dots, x_{iq})'$ is a p-dimensional vector of regressors (constant plus q attributes or
+characteristics) and the following hierarchical prior for the scale-mixing variables $\lambda_i$:
+$\lambda_1, \dots, \lambda_n$ iid Exponential(1/2):
+
+Recall that
+\[	f(\lambda) = \lambda e^{{-\lambda x}}\]
+
+### PART A)
+
+$$\begin{aligned}
+p\left(\epsilon_{i} | \sigma^{2}\right) &=\int_{0}^{\infty} p\left(\epsilon_{i} | \lambda_{i}, \sigma^{2}\right) p\left(\lambda_{i}\right) d \lambda_{i} \\
+&=\int_{0}^{\infty}\left(2 \pi \lambda_{i} \sigma^{2}\right)^{-1 / 2} \exp \left[-\epsilon_{i}^{2} /\left(2 \lambda_{i} \sigma^{2}\right)\right](1 / 2) \exp \left(-\lambda_{i} / 2\right) d \lambda_{i} \\
+&=(1 / 2)\left(2 \pi \sigma^{2}\right)^{-1 / 2} \int_{0}^{\infty} \lambda_{i}^{-1 / 2} \exp \left[-(1 / 2)\left(\lambda_{i}+\left[\epsilon_{i} / \sigma\right]^{2} \lambda_{i}^{-1}\right)\right] d \lambda_{i}
+\end{aligned}$$
+
+Now, make a change of variable and let $\psi_i = \lambda_i^{1/2}$. We can then express this integral as
+
+$$
+p\left(\epsilon_{i} | \sigma^{2}\right)=\left(2 \pi \sigma^{2}\right)^{-1 / 2} \int_{0}^{\infty} \exp \left(-[1 / 2]\left(\psi_{i}^{2}+\left[\epsilon_{i} / \sigma\right]^{2} \psi_{i}^{-2}\right)\right) d \psi_{i}
+$$
+
+The integral in above can be evaluated analytically. Using the following result from Andrews and Mallows (1974) 
+$$
+\int_{0}^{\infty} \exp \left\{-0.5\left(a^{2} u^{2}+b^{2} u^{-2}\right)\right\} d u=\left(\frac{\pi}{2 a^{2}}\right)^{1/2} \exp \{-|a b|\}
+$$
+Then $a=1$, $b=\epsilon_i/\sigma$, and $u = \psi_i$
+
+$$
+p\left(\epsilon_{i} | \sigma^{2}\right)=\left(2 \pi \sigma^{2}\right)^{-1 / 2} \left(\frac{\pi}{2}\right)^{1/2} \exp\{-|\epsilon_i/\sigma|\} =\frac{1}{2\sigma} \exp\left\{-\frac{|\epsilon_i|}{\sigma}\right\}
+$$
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
