@@ -400,13 +400,13 @@ p\left(y | X, \beta, \sigma^{2}, \{\lambda_i\}\right)
 p\left(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\right) &amp;\propto p\left(y | X, \beta, \sigma^{2}\right) \times p(\beta) \\
 &amp;\propto \exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} X^{T}\Lambda^{-1} y +\beta^{T} X^{T}\Lambda^{-1} X \beta \right)-\frac{1}{2}\left(-2 \beta^{T} V_{0}^{-1} \beta_{0}+\beta^{T} V_{0}^{-1} \beta\right)\right\} \\
 &amp;\propto 
-\exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} (X^{T}\Lambda^{-1} y +V_{0}^{-1} \beta_{0})+ \beta^{T} (X^{T}\Lambda^{-1} X +V_{0}^{-1} ) \beta \right)
+\exp \left\{-\frac{1}{2}\left(-2 \beta^{T} (X^{T}\Lambda^{-1} y/\sigma^2 +V_{0}^{-1} \beta_{0})+ \beta^{T} (X^{T}\Lambda^{-1} X/\sigma^2 +V_{0}^{-1} ) \beta \right)
 \right\}
 \end{align}
 \]</span> we recognize this as being proportional to a multivariate normal density, with <span class="math display">\[
 \begin{align}
 \beta | \{\lambda_i\}, \sigma^2, \mathcal{D} \sim N(\beta_1, V_1) \\
-\beta_{1}=V_{1}\left(X^{\prime} \Lambda^{-1} y+V_{0}^{-1} \beta_{0}\right) \qquad V_{1}=\left(X^{\prime} \Lambda^{-1} X / \sigma^{2}+V_{0}^{-1}\right)^{-1}
+\beta_{1}=V_{1}\left(X^{\prime} \Lambda^{-1} y/\sigma^2+V_{0}^{-1} \beta_{0}\right) \qquad V_{1}=\left(X^{\prime} \Lambda^{-1} X / \sigma^{2}+V_{0}^{-1}\right)^{-1}
 \end{align}
 \]</span></p>
 <p>As in most normal sampling problems, the semiconjugate prior distribution for <span class="math inline">\(\sigma^2\)</span> is an inverse-gamma distribution. Letting <span class="math inline">\(\gamma = 1/\sigma^2\)</span> be the measurement precision, this implies that <span class="math inline">\(\gamma \sim G\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)\)</span> then <span class="math display">\[
