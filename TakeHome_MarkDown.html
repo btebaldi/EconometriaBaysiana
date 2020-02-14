@@ -367,20 +367,24 @@ summary {
 </div>
 
 
-<div id="r-markdown" class="section level2">
-<h2>R Markdown</h2>
-<p>Consider the regression model <span class="math inline">\(y_i = x_i&#39;\beta + \epsilon_i0\)</span> <span class="math inline">\(\epsilon_i | \lambda_i ,\sigma^2 \sim N(0, \lambda_i\sigma^2)\)</span> where <span class="math inline">\(x_i = (1, x_{i1}, \dots, x_{iq})&#39;\)</span> is a p-dimensional vector of regressors (constant plus q attributes or characteristics) and the following hierarchical prior for the scale-mixing variables <span class="math inline">\(\lambda_i\)</span>: <span class="math inline">\(\lambda_1, \dots, \lambda_n\)</span> iid Exponential(1/2):</p>
+<div id="question" class="section level2">
+<h2>Question</h2>
+<p>Consider the regression model <span class="math inline">\(y_i = x_i&#39;\beta + \epsilon_i0\)</span> <span class="math inline">\(\epsilon_i | \lambda_i ,\sigma^2 \sim N(0, \lambda_i\sigma^2)\)</span> where <span class="math inline">\(x_i = (1, x_{i1}, \dots, x_{iq})&#39;\)</span> is a p-dimensional vector of regressors (constant plus q attributes or characteristics) and the following hierarchical prior for the scale-mixing variables <span class="math inline">\(\lambda_i\)</span>: <span class="math display">\[\begin{equation}
+\lambda_1, \dots, \lambda_n \sim \text{iid Exponential(1/2)}
+\end{equation}\]</span></p>
 <div id="part-a" class="section level3">
 <h3>PART A)</h3>
-<p><span class="math display">\[\begin{aligned}
+<p>We will show that <span class="math display">\[\begin{equation}
+p\left(\epsilon_{i} | \sigma^{2}\right)=\int_{0}^{\infty} p\left(\epsilon_{i} | \lambda_{i}, \sigma^{2}\right) p\left(\lambda_{i}\right) d \lambda_{i}=\frac{1}{2 \sigma} \exp \left\{-\frac{\left|\epsilon_{i}\right|}{\sigma}\right\}
+\end{equation}\]</span></p>
+<p>First consider <span class="math inline">\(p\left(\epsilon_{i} | \sigma^{2}\right)\)</span>, then we must have that: <span class="math display">\[\begin{align}
 p\left(\epsilon_{i} | \sigma^{2}\right) &amp;=\int_{0}^{\infty} p\left(\epsilon_{i} | \lambda_{i}, \sigma^{2}\right) p\left(\lambda_{i}\right) d \lambda_{i} \\
 &amp;=\int_{0}^{\infty}\left(2 \pi \lambda_{i} \sigma^{2}\right)^{-1 / 2} \exp \left[-\epsilon_{i}^{2} /\left(2 \lambda_{i} \sigma^{2}\right)\right](1 / 2) \exp \left(-\lambda_{i} / 2\right) d \lambda_{i} \\
 &amp;=(1 / 2)\left(2 \pi \sigma^{2}\right)^{-1 / 2} \int_{0}^{\infty} \lambda_{i}^{-1 / 2} \exp \left[-(1 / 2)\left(\lambda_{i}+\left[\epsilon_{i} / \sigma\right]^{2} \lambda_{i}^{-1}\right)\right] d \lambda_{i}
-\end{aligned}\]</span></p>
-<p>Now, make a change of variable and let <span class="math inline">\(\psi_i = \lambda_i^{1/2}\)</span>. We can then express this integral as</p>
-<p><span class="math display">\[
+\end{align}\]</span></p>
+<p>Now, make a change of variable and let <span class="math inline">\(\psi_i = \lambda_i^{1/2}\)</span>. We can then express this integral as <span class="math display">\[\begin{equation}
 p\left(\epsilon_{i} | \sigma^{2}\right)=\left(2 \pi \sigma^{2}\right)^{-1 / 2} \int_{0}^{\infty} \exp \left(-[1 / 2]\left(\psi_{i}^{2}+\left[\epsilon_{i} / \sigma\right]^{2} \psi_{i}^{-2}\right)\right) d \psi_{i}
-\]</span></p>
+\end{equation}\]</span></p>
 <p>The integral in above can be evaluated analytically. Using the following result from Andrews and Mallows (1974) <span class="math display">\[
 \int_{0}^{\infty} \exp \left\{-0.5\left(a^{2} u^{2}+b^{2} u^{-2}\right)\right\} d u=\left(\frac{\pi}{2 a^{2}}\right)^{1/2} \exp \{-|a b|\}
 \]</span> Then <span class="math inline">\(a=1\)</span>, <span class="math inline">\(b=\epsilon_i/\sigma\)</span>, and <span class="math inline">\(u = \psi_i\)</span></p>
@@ -392,7 +396,13 @@ p\left(\epsilon_{i} | \sigma^{2}\right)=\left(2 \pi \sigma^{2}\right)^{-1 / 2} \
 <h3>PART B)</h3>
 <p>Let <span class="math inline">\(y = (y_1, \dots, y_n)&#39;\)</span> and <span class="math inline">\(X = (x_1, \dots, x_n)&#39;\)</span>. Where we have the the following independent priors for <span class="math inline">\(\beta \sim N(\beta_0, V_0)\)</span> and <span class="math inline">\(\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)\)</span>. Also let <span class="math inline">\(\mathcal{D} = \{y;X\}\)</span>, and <span class="math inline">\(\Lambda\)</span> detnoted as follows <span class="math display">\[
 \Lambda  = \begin{bmatrix}\lambda_1 &amp; 0 &amp; \dots &amp; 0 \\ 0 &amp; \lambda_2 &amp; \dots &amp; 0 \\ 0 &amp; \vdots &amp; \ddots &amp; 0 \\ 0 &amp; 0 &amp; 0 &amp; \lambda_n \end{bmatrix}
-\]</span> We know that traditional GLS have that <span class="math inline">\(\beta = (X^T\Lambda^{-1}X)^{-1}X^T\Lambda^{-1}y\)</span>. If <span class="math inline">\(\beta \sim N(\beta_0, V_0)\)</span>, then <span class="math display">\[
+\]</span> To implement the Gibbs sampler we need to obtain the complete posterior conditionals for the parameters <span class="math inline">\(\beta\)</span>, <span class="math inline">\(\sigma^2\)</span>, and <span class="math inline">\(\{\lambda_i\}_{i=1}^{n}\)</span>. The joint posterior distribution is given as <span class="math display">\[\begin{equation}
+p\left(\beta,\left\{\lambda_{i}\right\}, \sigma^{2} | y\right) \propto\left[\prod_{i=1}^{n} \phi\left(y_{i} ; x_{i} \beta, \lambda_{i} \sigma^{2}\right) p\left(\lambda_{i}\right)\right] p(\beta) p\left(\sigma^{2}\right)
+\end{equation}\]</span></p>
+<p>We know that traditional GLS have that <span class="math inline">\(\beta = (X^T\Lambda^{-1}X)^{-1}X^T\Lambda^{-1}y\)</span>. If <span class="math inline">\(\beta \sim N(\beta_0, V_0)\)</span>, and <span class="math inline">\(\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0 \sigma_0^2}{2}\right)\)</span> then from the joint posterior, the following complete conditional posterior distributions are obtained:</p>
+<div id="the-beta-conditional-distribution-beta-lambda_i-sigma2-mathcald" class="section level4">
+<h4>The <span class="math inline">\(\beta\)</span> conditional distribution (<span class="math inline">\(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\)</span>)</h4>
+<p><span class="math display">\[
 \begin{align}
 p\left(y | X, \beta, \sigma^{2}, \{\lambda_i\}\right) 
 &amp;\propto \exp \left\{-\frac{1}{2 \sigma^{2}} \sum_{i=1}^{n} \hat\epsilon_i^2 \right\} \\
@@ -409,6 +419,9 @@ p\left(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\right) &amp;\propto p\left(y
 \beta_{1}=V_{1}\left(X^{\prime} \Lambda^{-1} y/\sigma^2+V_{0}^{-1} \beta_{0}\right) \qquad V_{1}=\left(X^{\prime} \Lambda^{-1} X / \sigma^{2}+V_{0}^{-1}\right)^{-1}
 \end{align}
 \]</span></p>
+</div>
+<div id="the-sigma2-conditional-distribution-sigma2-lambda-mathcald-beta" class="section level4">
+<h4>The <span class="math inline">\(\sigma^2\)</span> conditional distribution (<span class="math inline">\(\sigma^2| \Lambda, \mathcal{D}, \beta\)</span>)</h4>
 <p>As in most normal sampling problems, the semiconjugate prior distribution for <span class="math inline">\(\sigma^2\)</span> is an inverse-gamma distribution. Letting <span class="math inline">\(\gamma = 1/\sigma^2\)</span> be the measurement precision, this implies that <span class="math inline">\(\gamma \sim G\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)\)</span> then <span class="math display">\[
 \begin{align}
 p(\gamma | \mathcal{D}, \beta) &amp; \propto p(\gamma) p(y | X, \beta, \gamma) \\
@@ -423,20 +436,35 @@ p(\gamma | \mathcal{D}, \beta) &amp; \propto p(\gamma) p(y | X, \beta, \gamma) \
 \sigma^2| \Lambda, \mathcal{D}, \beta &amp;\sim IG\left(\frac{\nu_1}{2}, \frac{\nu_1 \sigma_1^2}{2}\right) \\
 &amp;\nu_1 = \nu_0 + n \qquad \nu_1\sigma_1^2 = \nu_0\sigma_0^2 + (y - X\beta)^T\Lambda^{-1}(y-x\beta)
 \end{align}
-\]</span> Lastly we have that <span class="math display">\[
-\begin{align}
-p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto p\left( y_{i}| \lambda_{i}, \beta, \sigma^{2}, x_{i}\right) p(\lambda_{i}) \\
-p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \frac{1}{\sqrt{2\pi \sigma^2 \lambda} }  
-\exp \left\{-\frac{1}{2}\left(\left(y_{i}-x_{i}^{T} \beta\right)^{2} \sigma^{-2}\lambda_{i}^{-1}\right)\right\} \exp \left\{-0.5 \lambda_{i}\right\} \\
-p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \lambda^{-1 / 2} \exp \left\{-0.5 \lambda_{i}\right\} 
-\exp \left\{-0.5\left(\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\} \\
-p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \lambda^{-1 / 2} \exp \left\{-0.5\left(\lambda_{i}+\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\}
-\end{align}
 \]</span></p>
 </div>
+<div id="the-lambda_i-conditional-distribution-lambda_i-beta-sigma2-mathcald" class="section level4">
+<h4>The <span class="math inline">\(\lambda_{i}\)</span> conditional distribution (<span class="math inline">\(\lambda_{i} | \beta, \sigma^{2}, \mathcal{D}\)</span>)</h4>
+<p>Lastly we have that <span class="math display">\[\begin{align}
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &amp;\propto p\left( y_{i}| \lambda_{i}, \beta, \sigma^{2}, x_{i}\right) p(\lambda_{i}) \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &amp;\propto \frac{1}{\sqrt{2\pi \sigma^2 \lambda} }\exp \left\{-\frac{1}{2}\left(\left(y_{i}-x_{i}^{T} \beta\right)^{2} \sigma^{-2}\lambda_{i}^{-1}\right)\right\} \exp \left\{-0.5 \lambda_{i}\right\} \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &amp;\propto \lambda^{-1 / 2} \exp \left\{-0.5 \lambda_{i}\right\} 
+\exp \left\{-0.5\left(\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\} \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &amp;\propto \lambda^{-1 / 2} \exp \left\{-0.5\left(\lambda_{i}+\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\}
+\end{align}\]</span></p>
+<p>We claim that this distribution is of the generalized inverse Gaussian (GIG) form. Following Shuster (1968), Michael, et. al. (1976), and Carlin and Polson (1991), we outline a strategy for obtaining a draw from this GIG density.</p>
+<p>We say that <span class="math inline">\(x\)</span> follows an inverse Gaussian distribution (<span class="math inline">\(x \sim invGauss(\psi, \mu)\)</span>) if <span class="math display">\[\begin{equation}
+p(x | \psi, \mu) \propto x^{-3 / 2} \exp \left(-\frac{\psi(x-\mu)^{2}}{2 x \mu^{2}}\right), \quad x&gt;0
+\end{equation}\]</span></p>
+<p>Now, let <span class="math inline">\(z = x^{−1}\)</span>. It follows by a change of variables that <span class="math display">\[\begin{align}
+p(z | \psi, \mu) &amp;\propto z^{-2} z^{3 / 2} \exp \left(-\frac{\psi\left(z^{-1}-\mu\right)^{2}}{2 z^{-1} \mu^{2}}\right) \\
+&amp; \propto z^{-1 / 2} \exp \left(-\frac{\psi}{2}\left[z+\mu^{-2} z^{-1}\right]\right)
+\end{align}\]</span></p>
+<p>Then notice that the posterior conditional for <span class="math inline">\(λ_i\)</span>, follows that the reciprocal of an <span class="math inline">\(invGauss(1, |\sigma/(y_i − x_i\beta)|)\)</span></p>
+<p>Then, a draw of <span class="math inline">\(\lambda_i\)</span> cam be done by inverting a draw from the inverse Gaussian distribution. The the only step is to draw from the inverse Gaussian distribution.</p>
+<p>Shuster (1968) notes that if <span class="math inline">\(x\)</span> has the inverse Gaussian density, then <span class="math inline">\(\psi(x − \mu)^2/x\mu^2 \sim \chi^2(1)\)</span>, a chi-square distribution with one degree of freedom. Let <span class="math inline">\(\nu_2 = \psi(x − \mu)^2/x\mu^2\)</span>, them the roots of <span class="math inline">\(nu_2\)</span>, denoted here as <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> are obtained as <span class="math display">\[\begin{align}
+\tag{(1)}
+&amp;x_{1}=\mu+\frac{\mu^{2} \nu_{2}}{2 \psi}-\frac{\mu}{2 \psi} \sqrt{4 \mu \psi \nu_{2}+\mu^{2} \nu_{2}^{2}}\\
+&amp;x_{2}=\mu^{2} / x_{1}
+\end{align}\]</span></p>
+<p>Michael et al. (1976) use this idea to show that one can obtain a draw from the inverse Gaussian <span class="math inline">\((\psi, \mu)\)</span> density by first drawing <span class="math inline">\(\nu_2 \sim \chi^2(1)\)</span>, calculating the roots <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> from the preceding equations, and then setting <span class="math inline">\(x\)</span> equal to <span class="math inline">\(x_1\)</span> with probability <span class="math inline">\(\mu/(\mu + x_1)\)</span> and equal to x2 with probability <span class="math inline">\(x_1/(\mu + x_1)\)</span>.</p>
 </div>
-<div id="including-plots" class="section level2">
-<h2>Including Plots</h2>
+</div>
 </div>
 
 

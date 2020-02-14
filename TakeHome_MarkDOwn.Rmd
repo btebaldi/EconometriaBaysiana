@@ -9,28 +9,33 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Question
 
 Consider the regression model
 $y_i = x_i'\beta + \epsilon_i0$
 $\epsilon_i | \lambda_i ,\sigma^2 \sim N(0, \lambda_i\sigma^2)$
-where $x_i = (1, x_{i1}, \dots, x_{iq})'$ is a p-dimensional vector of regressors (constant plus q attributes or
-characteristics) and the following hierarchical prior for the scale-mixing variables $\lambda_i$:
-$\lambda_1, \dots, \lambda_n$ iid Exponential(1/2):
+where $x_i = (1, x_{i1}, \dots, x_{iq})'$ is a p-dimensional vector of regressors (constant plus q attributes or characteristics) and the following hierarchical prior for the scale-mixing variables $\lambda_i$:
+\begin{equation}
+\lambda_1, \dots, \lambda_n \sim \text{iid Exponential(1/2)}
+\end{equation}
 
 ### PART A)
+We will show that 
+\begin{equation}
+p\left(\epsilon_{i} | \sigma^{2}\right)=\int_{0}^{\infty} p\left(\epsilon_{i} | \lambda_{i}, \sigma^{2}\right) p\left(\lambda_{i}\right) d \lambda_{i}=\frac{1}{2 \sigma} \exp \left\{-\frac{\left|\epsilon_{i}\right|}{\sigma}\right\}
+\end{equation}
 
-$$\begin{aligned}
+First consider $p\left(\epsilon_{i} | \sigma^{2}\right)$, then we must have that:
+\begin{align}
 p\left(\epsilon_{i} | \sigma^{2}\right) &=\int_{0}^{\infty} p\left(\epsilon_{i} | \lambda_{i}, \sigma^{2}\right) p\left(\lambda_{i}\right) d \lambda_{i} \\
 &=\int_{0}^{\infty}\left(2 \pi \lambda_{i} \sigma^{2}\right)^{-1 / 2} \exp \left[-\epsilon_{i}^{2} /\left(2 \lambda_{i} \sigma^{2}\right)\right](1 / 2) \exp \left(-\lambda_{i} / 2\right) d \lambda_{i} \\
 &=(1 / 2)\left(2 \pi \sigma^{2}\right)^{-1 / 2} \int_{0}^{\infty} \lambda_{i}^{-1 / 2} \exp \left[-(1 / 2)\left(\lambda_{i}+\left[\epsilon_{i} / \sigma\right]^{2} \lambda_{i}^{-1}\right)\right] d \lambda_{i}
-\end{aligned}$$
+\end{align}
 
 Now, make a change of variable and let $\psi_i = \lambda_i^{1/2}$. We can then express this integral as
-
-$$
+$$\begin{equation}
 p\left(\epsilon_{i} | \sigma^{2}\right)=\left(2 \pi \sigma^{2}\right)^{-1 / 2} \int_{0}^{\infty} \exp \left(-[1 / 2]\left(\psi_{i}^{2}+\left[\epsilon_{i} / \sigma\right]^{2} \psi_{i}^{-2}\right)\right) d \psi_{i}
-$$
+\end{equation}$$
 
 The integral in above can be evaluated analytically. Using the following result from Andrews and Mallows (1974) 
 $$
@@ -42,13 +47,22 @@ $$
 p\left(\epsilon_{i} | \sigma^{2}\right)=\left(2 \pi \sigma^{2}\right)^{-1 / 2} \left(\frac{\pi}{2}\right)^{1/2} \exp\{-|\epsilon_i/\sigma|\} =\frac{1}{2\sigma} \exp\left\{-\frac{|\epsilon_i|}{\sigma}\right\}
 $$
 
-###  PART B)
+### PART B)
 
 Let $y = (y_1, \dots, y_n)'$ and $X = (x_1, \dots, x_n)'$. Where we have the the following independent priors for $\beta \sim N(\beta_0, V_0)$ and $\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)$. Also let $\mathcal{D} = \{y;X\}$, and $\Lambda$ detnoted as follows
 $$
 \Lambda  = \begin{bmatrix}\lambda_1 & 0 & \dots & 0 \\ 0 & \lambda_2 & \dots & 0 \\ 0 & \vdots & \ddots & 0 \\ 0 & 0 & 0 & \lambda_n \end{bmatrix}
 $$
-We know that traditional GLS have that $\beta = (X^T\Lambda^{-1}X)^{-1}X^T\Lambda^{-1}y$. If $\beta \sim N(\beta_0, V_0)$, then
+To implement the Gibbs sampler we need to obtain the complete posterior conditionals for the parameters $\beta$, $\sigma^2$, and $\{\lambda_i\}_{i=1}^{n}$. The joint posterior distribution is given as
+\begin{equation}
+p\left(\beta,\left\{\lambda_{i}\right\}, \sigma^{2} | y\right) \propto\left[\prod_{i=1}^{n} \phi\left(y_{i} ; x_{i} \beta, \lambda_{i} \sigma^{2}\right) p\left(\lambda_{i}\right)\right] p(\beta) p\left(\sigma^{2}\right)
+\end{equation}
+
+
+We know that traditional GLS have that $\beta = (X^T\Lambda^{-1}X)^{-1}X^T\Lambda^{-1}y$. If $\beta \sim N(\beta_0, V_0)$, and $\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0 \sigma_0^2}{2}\right)$ then from the joint posterior, the following complete conditional posterior distributions are obtained:
+
+#### The $\beta$ conditional distribution ($\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}$)
+
 $$
 \begin{align}
 p\left(y | X, \beta, \sigma^{2}, \{\lambda_i\}\right) 
@@ -68,6 +82,9 @@ $$
 \beta_{1}=V_{1}\left(X^{\prime} \Lambda^{-1} y/\sigma^2+V_{0}^{-1} \beta_{0}\right) \qquad V_{1}=\left(X^{\prime} \Lambda^{-1} X / \sigma^{2}+V_{0}^{-1}\right)^{-1}
 \end{align}
 $$
+
+
+#### The $\sigma^2$ conditional distribution ($\sigma^2| \Lambda, \mathcal{D}, \beta$)
 
 As in most normal sampling problems, the semiconjugate prior distribution for $\sigma^2$ is an inverse-gamma distribution.
 Letting $\gamma = 1/\sigma^2$ be the measurement precision, this implies that $\gamma \sim G\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)$ then 
@@ -90,16 +107,40 @@ $$
 &\nu_1 = \nu_0 + n \qquad \nu_1\sigma_1^2 = \nu_0\sigma_0^2 + (y - X\beta)^T\Lambda^{-1}(y-x\beta)
 \end{align}
 $$
-Lastly we have that
-$$
-\begin{align}
-p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto p\left( y_{i}| \lambda_{i}, \beta, \sigma^{2}, x_{i}\right) p(\lambda_{i}) \\
-p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \frac{1}{\sqrt{2\pi \sigma^2 \lambda} }  
-\exp \left\{-\frac{1}{2}\left(\left(y_{i}-x_{i}^{T} \beta\right)^{2} \sigma^{-2}\lambda_{i}^{-1}\right)\right\} \exp \left\{-0.5 \lambda_{i}\right\} \\
-p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \lambda^{-1 / 2} \exp \left\{-0.5 \lambda_{i}\right\} 
-\exp \left\{-0.5\left(\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\} \\
-p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) \propto \lambda^{-1 / 2} \exp \left\{-0.5\left(\lambda_{i}+\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\}
-\end{align}
-$$
 
-## Including Plots
+
+#### The $\lambda_{i}$ conditional distribution ($\lambda_{i} | \beta, \sigma^{2}, \mathcal{D}$)
+Lastly we have that
+\begin{align}
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &\propto p\left( y_{i}| \lambda_{i}, \beta, \sigma^{2}, x_{i}\right) p(\lambda_{i}) \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &\propto \frac{1}{\sqrt{2\pi \sigma^2 \lambda} }\exp \left\{-\frac{1}{2}\left(\left(y_{i}-x_{i}^{T} \beta\right)^{2} \sigma^{-2}\lambda_{i}^{-1}\right)\right\} \exp \left\{-0.5 \lambda_{i}\right\} \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &\propto \lambda^{-1 / 2} \exp \left\{-0.5 \lambda_{i}\right\} 
+\exp \left\{-0.5\left(\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\} \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &\propto \lambda^{-1 / 2} \exp \left\{-0.5\left(\lambda_{i}+\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\}
+\end{align}
+
+We claim that this distribution is of the generalized inverse Gaussian (GIG) form. Following Shuster (1968), Michael, et. al. (1976), and Carlin and Polson (1991), we outline a strategy for obtaining a draw from this GIG density.
+
+We say that $x$ follows an inverse Gaussian distribution ($x \sim invGauss(\psi, \mu)$) if
+\begin{equation}
+p(x | \psi, \mu) \propto x^{-3 / 2} \exp \left(-\frac{\psi(x-\mu)^{2}}{2 x \mu^{2}}\right), \quad x>0
+\end{equation}
+
+Now, let $z = x^{−1}$. It follows by a change of variables that
+\begin{align}
+p(z | \psi, \mu) &\propto z^{-2} z^{3 / 2} \exp \left(-\frac{\psi\left(z^{-1}-\mu\right)^{2}}{2 z^{-1} \mu^{2}}\right) \\
+& \propto z^{-1 / 2} \exp \left(-\frac{\psi}{2}\left[z+\mu^{-2} z^{-1}\right]\right)
+\end{align}
+
+Then notice that the posterior conditional for $λ_i$, follows that the reciprocal of an $invGauss(1, |\sigma/(y_i − x_i\beta)|)$
+
+Then, a draw of $\lambda_i$ cam be done by inverting a draw from the inverse Gaussian distribution. The the only step is to draw from the inverse Gaussian distribution.
+
+Shuster (1968) notes that if $x$ has the inverse Gaussian density, then $\psi(x − \mu)^2/x\mu^2 \sim \chi^2(1)$, a chi-square distribution with one degree of freedom. Let $\nu_2 = \psi(x − \mu)^2/x\mu^2$, them the roots of $nu_2$, denoted here as $x_1$ and $x_2$ are obtained as 
+\begin{align}
+&x_{1}=\mu+\frac{\mu^{2} \nu_{2}}{2 \psi}-\frac{\mu}{2 \psi} \sqrt{4 \mu \psi \nu_{2}+\mu^{2} \nu_{2}^{2}}\\
+&x_{2}=\mu^{2} / x_{1}
+\end{align}
+
+Michael et al. (1976) use this idea to show that one can obtain a draw from the inverse Gaussian $(\psi, \mu)$ density by first drawing $\nu_2 \sim \chi^2(1)$, calculating the roots $x_1$ and $x_2$ from the preceding equations, and then setting $x$ equal to $x_1$ with probability
+$\mu/(\mu + x_1)$ and equal to x2 with probability $x_1/(\mu + x_1)$.
