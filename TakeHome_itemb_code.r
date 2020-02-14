@@ -1,18 +1,3 @@
-################################################################################
-#
-#  Bayesian linear regression
-#  with Normal or Normal-Gamma prior for coefficients
-#
-################################################################################
-#
-# Analysing the Canadian Lynx data
-# Moran (1953) fit an AR(2) model:
-# y(t) = 1.05 + 1.41*y(t-1) - 0.77*y(t-2) + e(t)
-#
-# Moran (1953) The Statistical Analysis of the Canadian Lynx Cycle.
-# Australian Journal of Zoology, 1, pp 163-173.
-#
-################################################################################
 
 library(statmod)
 library(nimble)
