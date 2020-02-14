@@ -152,7 +152,9 @@ We now simulate $n = 200$ observations from the above linear regression with dou
 We first load libraries and clear any variables to start with a clear enviroment. 
 ```{r, message=FALSE}
 # Libraries
-library(statmod)
+library(statmod) # Used for Inverse Gausian
+library(nimble)  # Used for double exponential
+library(pracma)  # Used for Time Evaluation
 
 # Clear Vars
 rm(list = ls())
@@ -186,7 +188,7 @@ n = 200
 
 # regressors
 nregress = 4
-beta_true = as.matrix(1:nregress, nregress,1)
+beta_true = as.matrix(0:(nregress-1), nregress,1)
 
 # Regressors Matrix
 X = matrix(rnorm(nregress*n,0,1), n, nregress)
@@ -197,12 +199,16 @@ sigma_true = 1
 
 We then we proced seting up the simulation. We use a draw form the double exponential for the erros, however a draw for lambda and then the construction of the errors could also be used.
 ```{r Simulation}
+# We opt to use the Double exponential extrection
+USE_DOUBLE_EXP = TRUE
+
 # Simulacao
-if(FALSE){
+if(USE_DOUBLE_EXP){
+  error_true = nimble::rdexp(n, location = 0, scale = sigma_true)
+} else
+{
   lambda_true = rexp(n,1/2)
   error_true  = rnorm(n, 0, sqrt(sigma_true*lambda_true))
-} else{
-  error_true = nimble::rdexp(n, location = 0, scale = sigma_true)
 }
 
 # Simulation
@@ -260,6 +266,10 @@ lambda = rep(1,n)
 ```
 Then we proceed with the MCMC, one could make the draw from the inverse Gaussian using the *statmod* r package or the procedure done by michael et. al.
 ```{r MCMC}
+# We opt to use Michael method
+USE_MICHAEL_METHOD = TRUE
+
+# table to store execution time
 dt_time = data.frame(Method = c("MH", "GIBBS"), Time = NA, ess=NA, ess_ps = NA)
 for (k in 1:2) {
   if(k==1)
@@ -267,7 +277,7 @@ for (k in 1:2) {
   else
   { MH=FALSE }
   
-  begin_time = Sys.time()
+  pracma::tic()
   for (i in 1:(niter)){
     
     # Inicialize Lambda^{-1}  matrix
@@ -302,22 +312,26 @@ for (k in 1:2) {
       # mu for row j
       mu_j = abs(sqrt(sig2)/(y_j - x_j %*% beta)) 
       
-      if(TRUE){
+      if(USE_MICHAEL_METHOD){
         #  x1 e x2
         x_1 = mu_j + (mu_j^2 * nu_michael_0)/2 - mu_j/2 * (4 * mu_j * nu_michael_0 + mu_j^2 * nu_michael_0^2)^0.5
         x_2 = mu_j^2 / x_1
         
         # decide between x_1 and x_2
         p.treshold = mu_j/(mu_j + x_1)
-        if (runif(1) < p.treshold){
+        if (runif(1) < p.treshold)
+        {
           x_star = x_1
-        } else{
+        }
+        else
+        {
           x_star = x_2
         }
         
         # invert x_star
         lambda_j = 1/x_star
-      }else
+      }
+      else
       {
         lambda_j = statmod::rinvgauss(1, mu_j, shape = 1) 
       }
@@ -343,13 +357,20 @@ for (k in 1:2) {
     {draws.gibbs[i,] = c(sig2, beta)}
     
   }
-  end_time = Sys.time()
   
   # Determine Execution Time
-  dt_time[k, "Time"] = end_time - begin_time
+  dt_time[k, "Time"] = pracma::toc()
   
   # Determine ESS
-  dt_time[k, "ess"] = round(M/(1+2*sum(acf(draws.mc[,"sigma"],lag.max=1000,plot=FALSE)$acf[2:1001])))
+  if(MH)
+  {
+    dt_time[k, "ess"] = round(M/(1+2*sum(acf(draws.mc[,"sigma"],lag.max=1000,plot=FALSE)$acf[2:1001])))
+  }
+  else
+  {
+    dt_time[k, "ess"] = round(M/(1+2*sum(acf(draws.gibbs[,"sigma"],lag.max=1000,plot=FALSE)$acf[2:1001])))
+  }
+  
 }
 
 # Determine the ess per second
@@ -399,7 +420,7 @@ legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
 plot(draws2$beta.3, xlab="Iteration", ylab="beta_4",main="Interations", type = "l")
 ```
 
-Lastily we evaluate if MH perform better. Notice that in this case the MH sampler has better performance than the GIBBS.
+Lastily we evaluate if MH perform better. We present the following table. 
 ```{r}
 dt_time
 ```
