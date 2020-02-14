@@ -223,6 +223,8 @@ plot(X%*%beta_true, Y, xlab = "Y predicted", ylab = "Y")
 hist(ols$residuals, breaks=15, main="Histogram of Ols residuals", xlab = "Residuals", ylab = "Frequency")
 
 ```
+
+
 Now we make the initial setup of the MCMC. We set a *Burn up* sample of size $10^4$, and a final sample of size $10^3$. We also store the draws in a table.
 ```{r MCMC_setup}
 # MCMC set-up
@@ -369,28 +371,28 @@ legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
 acf(draws2$sigma)
 
 par(mfrow=c(1,2))
-hist(draws2$beta.1, breaks = 50, main="Histogram of beta_1", xlab = "beta_1", ylab = "Frequency")
+hist(draws2$beta.1, breaks = 50, main="Histogram of beta_1", xlab = "beta_1", ylab = "Frequency", xlim = range(beta_true[1], beta.ols[1], draws2$beta.1))
 abline(v = beta_true[1], col="red")
 abline(v = beta.ols[1], col="blue")
 legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
 plot(draws2$beta.1, xlab="Iteration", ylab="beta_1",main="Interations", type = "l")
 
 par(mfrow=c(1,2))
-hist(draws2$beta.2, breaks = 50, main="Histogram of beta_2", xlab = "beta_2", ylab = "Frequency")
+hist(draws2$beta.2, breaks = 50, main="Histogram of beta_2", xlab = "beta_2", ylab = "Frequency", xlim = range(beta_true[2], beta.ols[2], draws2$beta.2))
 abline(v = beta_true[2], col="red")
 abline(v = ols$coefficients[2], col="blue")
 legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
 plot(draws2$beta.2, xlab="Iteration", ylab="beta_2",main="Interations", type = "l")
 
 par(mfrow=c(1,2))
-hist(draws2$beta.3, breaks = 50, main="Histogram of beta_3", xlab = "beta_3", ylab = "Frequency")
+hist(draws2$beta.3, breaks = 50, main="Histogram of beta_3", xlab = "beta_3", ylab = "Frequency", xlim = range(beta_true[3], beta.ols[3], draws2$beta.3))
 abline(v = beta_true[3], col="red")
 abline(v = ols$coefficients[3], col="blue")
 legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
 plot(draws2$beta.3, xlab="Iteration", ylab="beta_3",main="Interations", type = "l")
 
 par(mfrow=c(1,2))
-hist(draws2$beta.4, breaks = 50, main="Histogram of beta_4", xlab = "beta_4", ylab = "Frequency")
+hist(draws2$beta.4, breaks = 50, main="Histogram of beta_4", xlab = "beta_4", ylab = "Frequency", xlim = range(beta_true[4], beta.ols[4], draws2$beta.4))
 abline(v = beta_true[4], col="red")
 abline(v = ols$coefficients[4], col="blue")
 legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
