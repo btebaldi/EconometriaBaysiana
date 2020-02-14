@@ -53,7 +53,7 @@ Let $y = (y_1, \dots, y_n)'$ and $X = (x_1, \dots, x_n)'$. Where we have the the
 $$
 \Lambda  = \begin{bmatrix}\lambda_1 & 0 & \dots & 0 \\ 0 & \lambda_2 & \dots & 0 \\ 0 & \vdots & \ddots & 0 \\ 0 & 0 & 0 & \lambda_n \end{bmatrix}
 $$
-To implement the Gibbs sampler we need to obtain the complete posterior conditionals for the parameters $\beta$, $\sigma^2$, and $\{\lambda_i\}_{i=1}^{n}$. The joint posterior distribution is given as
+To implement the Gibbs sampler we need to obtain the complete posterior conditionals for the parameters $\beta$, $\sigma^2$, and $\{\lambda_i\}_{i=1}^{n}$ and cycle through the posteriors conditional distributions. The joint posterior distribution is given as
 \begin{equation}
 p\left(\beta,\left\{\lambda_{i}\right\}, \sigma^{2} | y\right) \propto\left[\prod_{i=1}^{n} \phi\left(y_{i} ; x_{i} \beta, \lambda_{i} \sigma^{2}\right) p\left(\lambda_{i}\right)\right] p(\beta) p\left(\sigma^{2}\right)
 \end{equation}
