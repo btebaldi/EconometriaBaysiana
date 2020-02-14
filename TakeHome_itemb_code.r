@@ -96,108 +96,136 @@ sigma2 = sigma2.ols
 beta = beta.ols
 lambda = rep(1,n)
 
-for (i in 1:(niter)){
-
-  # Inicializo matrix Lambda^{-1}
-  Lambda_1 = solve(diag(lambda))
+dt_time = data.frame(Method = c("MH", "GIBBS"), Time = NA, ess=NA, ess_ps = NA)
+for (k in 1:2) {
+  if(k==1)
+  { MH = TRUE }
+  else
+  { MH=FALSE }
   
-  # full conditional of sigma2  
-  d0=(nu_0 * sigma2_0)/2
-  par1 = (nu_0 + n)/2
-  par2 = d0 + ( t(Y-X%*%beta) %*% Lambda_1 %*% (Y-X%*%beta) )/2
-  
-  # Conditional distribution of sigma 
-  sig2 = 1/rgamma(1, par1, par2)
-  
-  # full conditional of beta
-  XtX = t(X) %*% Lambda_1 %*% X
-  XtY = t(X) %*% Lambda_1 %*% Y
-  
-  # V_0 = diag(1/lambda)
-  
-  V_1   = solve(XtX/sig2 + solve(V_0))
-  beta_1 = V_1 %*% (XtY/sig2 + solve(V_0) %*% beta_0)
-  
-  beta =  beta_1 + t(chol(V_1)) %*% rnorm(nregress)
-  
-  # Seguindo terminologia de Koop. (Bayesian Econometrics Methods) pag 260
-  
-  # Draw of lambda
-  for (j in 1:n){
-    # psi1 = rexp(n, 0.5)
-    y_j = Y[j, 1]
-    x_j = X[j, ]
+  begin_time = Sys.time()
+  for (i in 1:(niter)){
     
-    # faco draw de no_0
-    nu_michael_0 = rchisq(1,1)
+    # Inicialize Lambda^{-1}  matrix
+    Lambda_1 = solve(diag(lambda))
     
-    if(TRUE){
-      #  x1 e x2
-      x_1 = mu_j + (mu_j^2 * nu_michael_0)/2 - mu_j/2 * (4 * mu_j * nu_michael_0 + mu_j^2 * nu_michael_0^2)^0.5
-      x_2 = mu_j^2 / x_1
+    # full conditional of sigma2  
+    d0=(nu_0 * sigma2_0)/2
+    par1 = (nu_0 + n)/2
+    par2 = d0 + ( t(Y-X%*%beta) %*% Lambda_1 %*% (Y-X%*%beta) )/2
+    
+    # Conditional distribution of sigma 
+    sig2 = 1/rgamma(1, par1, par2)
+    
+    # full conditional of beta
+    XtX = t(X) %*% Lambda_1 %*% X
+    XtY = t(X) %*% Lambda_1 %*% Y
+    
+    V_1   = solve(XtX/sig2 + solve(V_0))
+    beta_1 = V_1 %*% (XtY/sig2 + solve(V_0) %*% beta_0)
+    beta =  beta_1 + t(chol(V_1)) %*% rnorm(nregress)
+    
+    # Foolowing Koop. (Bayesian Econometrics Methods) pag 260
+    
+    # Draw of lambda
+    for (j in 1:n){
+      y_j = Y[j, 1]
+      x_j = X[j, ]
       
-      # decide between x_1 and x_2
-      p.treshold = mu_j/(mu_j + x_1)
-      if (runif(1) < p.treshold){
-        x_star = x_1
-      } else{
-        x_star = x_2
+      # draw de nu_0
+      nu_michael_0 = rchisq(1,1)
+      
+      # mu for row j
+      mu_j = abs(sqrt(sig2)/(y_j - x_j %*% beta)) 
+      
+      if(TRUE){
+        #  x1 e x2
+        x_1 = mu_j + (mu_j^2 * nu_michael_0)/2 - mu_j/2 * (4 * mu_j * nu_michael_0 + mu_j^2 * nu_michael_0^2)^0.5
+        x_2 = mu_j^2 / x_1
+        
+        # decide between x_1 and x_2
+        p.treshold = mu_j/(mu_j + x_1)
+        if (runif(1) < p.treshold){
+          x_star = x_1
+        } else{
+          x_star = x_2
+        }
+        
+        # invert x_star
+        lambda_j = 1/x_star
+      }else
+      {
+        lambda_j = statmod::rinvgauss(1, mu_j, shape = 1) 
       }
       
-      # invert x_star
-      lambda_j = 1/x_star
-    }else
-    {
-      lambda_j = statmod::rinvgauss(1, mu_j, shape = 1) 
-    }
-    
-    # draw from inverse Gausian
-    if (lambda_j >0){
       
-      # deno = func_F(lambda_j, y_j, x_j, beta, sig2) + func_q(lambda[j], y_j, x_j, beta, sqrt(sig2))
-      # nume = func_q(lambda[j], y_j, x_j, beta, sqrt(sig2)) #+ dexp(lambda_j , rate = 0.5, log=TRUE)
-      
-      deno = func_F(lambda_j, y_j, x_j, beta, sig2) + func_q(lambda[j], y_j, x_j, beta, sqrt(sig2))
-      nume = func_F(lambda[j], y_j, x_j, beta, sig2) + func_q(lambda_j, y_j, x_j, beta, sqrt(sig2))
-      
-      
-      log.rho = min(0, nume-deno)
-      if (log(runif(1)) < log.rho){
-        lambda[j] = lambda_j
+      # now the Metropolis-Hasting
+      if ((lambda_j >0) & (MH)){
+        
+        deno = func_F(lambda_j, y_j, x_j, beta, sig2) + func_q(lambda[j], y_j, x_j, beta, sqrt(sig2))
+        nume = func_F(lambda[j], y_j, x_j, beta, sig2) + func_q(lambda_j, y_j, x_j, beta, sqrt(sig2))
+        
+        log.rho = min(0, nume-deno)
+        if (log(runif(1)) < log.rho){
+          lambda[j] = lambda_j
+        }
       }
     }
+    
+    # storing draws
+    if(MH)
+    {draws.mc[i,] = c(sig2, beta)}
+    else
+    {draws.gibbs[i,] = c(sig2, beta)}
+    
   }
+  end_time = Sys.time()
   
-  # storing draws
-  draws.ng[i,] = c(sig2,beta, lambda)
+  # Determine Execution Time
+  dt_time[k, "Time"] = end_time - begin_time
+  
+  # Determine ESS
+  dt_time[k, "ess"] = round(M/(1+2*sum(acf(draws.mc[,"sigma"],lag.max=1000,plot=FALSE)$acf[2:1001])))
 }
 
-# end_time <- 
-Sys.time()
-system.time()
+# Determine the ess per second
+dt_time$ess_ps = dt_time$ess / dt_time$Time
 
-draws2 = data.frame(draws.ng[(M0+1):niter,])
+draws2 = data.frame(draws.mc[(M0+1):niter,])
 colnames(draws2)
 summary(draws2$sigma)
 
-x11()
-par(mfrow=c(4,2))
-hist(draws2$sigma, breaks = 50)
-abline(v=sigma_true, col=2)
-abline(v=sigma2, col="blue")
+par(mfrow=c(1,2))
+hist(draws2$sigma, breaks = 50, main="Histogram of Sigma", xlab = "Sigma", ylab = "Frequency", xlim = range(sigma_true, sigma2.ols, draws2$sigma))
+abline(v=sigma_true, col="red")
+abline(v=sigma2.ols, col="blue")
+legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
 acf(draws2$sigma)
 
-hist(draws2$beta.1, breaks = 50)
-abline(v = beta_true[1], col=2)
-abline(v = ols$coefficients[1], col="blue")
-plot(draws2$beta.1,xlab="Iteration",ylab=expression(sigma),main="With DA", type = "l")
+par(mfrow=c(1,2))
+hist(draws2$beta.1, breaks = 50, main="Histogram of beta_1", xlab = "beta_1", ylab = "Frequency")
+abline(v = beta_true[1], col="red")
+abline(v = beta.ols[1], col="blue")
+legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
+plot(draws2$beta.1, xlab="Iteration", ylab="beta_1",main="Interations", type = "l")
 
-hist(draws2$beta.2, breaks = 50)
-abline(v = beta_true[2], col=2)
+par(mfrow=c(1,2))
+hist(draws2$beta.2, breaks = 50, main="Histogram of beta_2", xlab = "beta_2", ylab = "Frequency")
+abline(v = beta_true[2], col="red")
 abline(v = ols$coefficients[2], col="blue")
-plot(draws2$beta.2,xlab="Iteration",ylab=expression(sigma),main="With DA", type = "l")
+legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
+plot(draws2$beta.2, xlab="Iteration", ylab="beta_2",main="Interations", type = "l")
 
-hist(draws2$beta.3, breaks = 50)
-abline(v = beta_true[3], col=2)
-abline(v = ols$coefficients[2], col="blue")
-plot(draws2$beta.3,xlab="Iteration",ylab=expression(sigma),main="With DA", type = "l")
+par(mfrow=c(1,2))
+hist(draws2$beta.3, breaks = 50, main="Histogram of beta_3", xlab = "beta_3", ylab = "Frequency")
+abline(v = beta_true[3], col="red")
+abline(v = ols$coefficients[3], col="blue")
+legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
+plot(draws2$beta.3, xlab="Iteration", ylab="beta_3",main="Interations", type = "l")
+
+par(mfrow=c(1,2))
+hist(draws2$beta.4, breaks = 50, main="Histogram of beta_4", xlab = "beta_4", ylab = "Frequency")
+abline(v = beta_true[4], col="red")
+abline(v = ols$coefficients[4], col="blue")
+legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
+plot(draws2$beta.3, xlab="Iteration", ylab="beta_4",main="Interations", type = "l")

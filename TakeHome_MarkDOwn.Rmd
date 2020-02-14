@@ -220,7 +220,7 @@ summary(ols)
 # histogram
 par(mfrow=c(1,2))
 plot(X%*%beta_true, Y, xlab = "Y predicted", ylab = "Y")
-hist(ols$residuals, breaks=15, main="Histogram of Ols resduals", xlab = "Residuals", ylab = "Frequency")
+hist(ols$residuals, breaks=15, main="Histogram of Ols residuals", xlab = "Residuals", ylab = "Frequency")
 
 ```
 Now we make the initial setup of the MCMC. We set a *Burn up* sample of size $10^4$, and a final sample of size $10^3$. We also store the draws in a table.
@@ -233,8 +233,11 @@ niter = M0+M
 
 # TABLE DRAWS
 ncol.draws = 1 + nregress
-draws.ng = matrix(0, nrow = niter, ncol = ncol.draws)
-colnames(draws.ng) = c("sigma", paste("beta", 1:nregress))
+draws.mc = matrix(0, nrow = niter, ncol = ncol.draws)
+colnames(draws.mc) = c("sigma", paste("beta", 1:nregress))
+
+draws.gibbs = matrix(0, nrow = niter, ncol = ncol.draws)
+colnames(draws.gibbs) = c("sigma", paste("beta", 1:nregress))
 
 ```
 
@@ -255,12 +258,12 @@ lambda = rep(1,n)
 ```
 Then we proceed with the MCMC, one could make the draw from the inverse Gaussian using the *statmod* r package or the procedure done by michael et. al.
 ```{r MCMC}
-dt_time = data.frame(Method = c("MH", "GIBBS"), Time = NA)
+dt_time = data.frame(Method = c("MH", "GIBBS"), Time = NA, ess=NA, ess_ps = NA)
 for (k in 1:2) {
   if(k==1)
-  {    MH = TRUE}
+  { MH = TRUE }
   else
-  {MH=FALSE}
+  { MH=FALSE }
   
   begin_time = Sys.time()
   for (i in 1:(niter)){
@@ -332,41 +335,70 @@ for (k in 1:2) {
     }
     
     # storing draws
-    draws.ng[i,] = c(sig2, beta)
+    if(MH)
+    {draws.mc[i,] = c(sig2, beta)}
+    else
+    {draws.gibbs[i,] = c(sig2, beta)}
+    
   }
   end_time = Sys.time()
+  
+  # Determine Execution Time
   dt_time[k, "Time"] = end_time - begin_time
+  
+  # Determine ESS
+  dt_time[k, "ess"] = round(M/(1+2*sum(acf(draws.mc[,"sigma"],lag.max=1000,plot=FALSE)$acf[2:1001])))
 }
+
+# Determine the ess per second
+dt_time$ess_ps = dt_time$ess / dt_time$Time
+
 ```
 
 We them print the distributions 
 ```{r}
-draws2 = data.frame(draws.ng[(M0+1):niter,])
+draws2 = data.frame(draws.mc[(M0+1):niter,])
 colnames(draws2)
 summary(draws2$sigma)
 
 par(mfrow=c(1,2))
-hist(draws2$sigma, breaks = 50)
-abline(v=sigma_true, col=2)
-abline(v=sigma2, col="blue")
+hist(draws2$sigma, breaks = 50, main="Histogram of Sigma", xlab = "Sigma", ylab = "Frequency", xlim = range(sigma_true, sigma2.ols, draws2$sigma))
+abline(v=sigma_true, col="red")
+abline(v=sigma2.ols, col="blue")
+legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
 acf(draws2$sigma)
 
 par(mfrow=c(1,2))
-hist(draws2$beta.1, breaks = 50)
-abline(v = beta_true[1], col=2)
-abline(v = ols$coefficients[1], col="blue")
-plot(draws2$beta.1,xlab="Iteration",ylab=expression(sigma),main="With DA", type = "l")
+hist(draws2$beta.1, breaks = 50, main="Histogram of beta_1", xlab = "beta_1", ylab = "Frequency")
+abline(v = beta_true[1], col="red")
+abline(v = beta.ols[1], col="blue")
+legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
+plot(draws2$beta.1, xlab="Iteration", ylab="beta_1",main="Interations", type = "l")
 
 par(mfrow=c(1,2))
-hist(draws2$beta.2, breaks = 50)
-abline(v = beta_true[2], col=2)
+hist(draws2$beta.2, breaks = 50, main="Histogram of beta_2", xlab = "beta_2", ylab = "Frequency")
+abline(v = beta_true[2], col="red")
 abline(v = ols$coefficients[2], col="blue")
-plot(draws2$beta.2,xlab="Iteration",ylab=expression(sigma),main="With DA", type = "l")
+legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
+plot(draws2$beta.2, xlab="Iteration", ylab="beta_2",main="Interations", type = "l")
 
 par(mfrow=c(1,2))
-hist(draws2$beta.3, breaks = 50)
-abline(v = beta_true[3], col=2)
-abline(v = ols$coefficients[2], col="blue")
-plot(draws2$beta.3,xlab="Iteration",ylab=expression(sigma),main="With DA", type = "l")
+hist(draws2$beta.3, breaks = 50, main="Histogram of beta_3", xlab = "beta_3", ylab = "Frequency")
+abline(v = beta_true[3], col="red")
+abline(v = ols$coefficients[3], col="blue")
+legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
+plot(draws2$beta.3, xlab="Iteration", ylab="beta_3",main="Interations", type = "l")
+
+par(mfrow=c(1,2))
+hist(draws2$beta.4, breaks = 50, main="Histogram of beta_4", xlab = "beta_4", ylab = "Frequency")
+abline(v = beta_true[4], col="red")
+abline(v = ols$coefficients[4], col="blue")
+legend("bottom", c("OLS", "MCMC"), col = c("blue", "red"), lty=1)
+plot(draws2$beta.3, xlab="Iteration", ylab="beta_4",main="Interations", type = "l")
+```
+
+Lastily we evaluate if MH perform better. Notice that in this case the MH sampler has better performance than the GIBBS.
+```{r}
+dt_time
 ```
 
