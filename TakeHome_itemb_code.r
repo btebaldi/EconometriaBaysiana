@@ -15,6 +15,7 @@
 ################################################################################
 
 library(statmod)
+library(nimble)
 
 # limpeza de variaveis
 rm(list = ls())
@@ -38,21 +39,26 @@ func_F = function(lambda_i, y_i, x_i, beta, sig2)
 set.seed(12345)
 
 # tamanho da amostra
-n = 100
+n = 200
 
 # Numero de regressores
-nregress = 3
+nregress = 4
+beta_true = as.matrix(1:nregress, nregress,1)
+
+# Regressors Matrix
+X = matrix(rnorm(nregress*n,0,1), n, nregress)
+
+# declare sigma
+sigma_true = 1
+
 
 # Simulacao
-lambda_true <- rexp(n,1/2)
-
-sigma_true <- 1
-error_true <- rnorm(n,0,sqrt(sigma_true*lambda_true))
-
-X <- matrix(rnorm(3*n,0,2),100,nregress)
-X[,1] <- 1
-
-beta_true <- as.matrix(rep(runif(nregress),1))
+if(FALSE){
+  lambda_true = rexp(n,1/2)
+  error_true  = rnorm(n, 0, sqrt(sigma_true*lambda_true))
+} else{
+  error_true = nimble::rdexp(n, location = 0, scale = sig2^0.5)
+}
 
 Y <- X%*%beta_true + error_true  
 
@@ -63,8 +69,8 @@ summary(ols)
 
 # histograma dos residuos
 par(mfrow=c(1,2))
-plot(X%*%beta_true, Y)
-hist(ols$residuals,breaks=15)
+plot(X%*%beta_true, Y, xlab = "Y predicted", ylab = "Y")
+hist(ols$residuals, breaks=15, main="Histogram of Ols resduals", xlab = "Residuals", ylab = "Frequency")
 
 # PARAMETROS DE MCMC set-up
 M0    = 1000  # Final
@@ -73,18 +79,21 @@ niter = M0+M
 
 # TABELA DE DRAWS: 
 # --------------------------------------
-ncol = 1 + nregress + n
-draws.ng = matrix(0, nrow = niter, ncol = ncol)
-colnames(draws.ng) = c("sigma", paste("beta", 1:nregress), paste("Lambda", 1:n))
+ncol.draws = 1 + nregress
+draws.ng = matrix(0, nrow = niter, ncol = ncol.draws)
+colnames(draws.ng) = c("sigma", paste("beta", 1:nregress))
 
-# priors
-beta_0 = matrix(ols$coefficients,3,1)
-beta <- matrix(ols$coefficients,3,1)
-# beta <- matrix(-10,3,1)
-sigma2 <- summary(ols)$sigma^2
+# priors of beta
+beta_0 = matrix(0, nregress, 1)
+V_0 = diag(25, nregress)
+
+# priors of sigma
 sigma2_0 = 1
 nu_0 = 2.5
-V_0 = diag(sigma2, nregress)
+
+# initial Values
+sigma2 = sigma2.ols
+beta = beta.ols
 lambda = rep(1,n)
 
 for (i in 1:(niter)){
@@ -98,7 +107,7 @@ for (i in 1:(niter)){
   par2 = d0 + ( t(Y-X%*%beta) %*% Lambda_1 %*% (Y-X%*%beta) )/2
   
   # Conditional distribution of sigma 
-  sig2 = 1/rgamma(1,par1,par2)
+  sig2 = 1/rgamma(1, par1, par2)
   
   # full conditional of beta
   XtX = t(X) %*% Lambda_1 %*% X
@@ -122,24 +131,25 @@ for (i in 1:(niter)){
     # faco draw de no_0
     nu_michael_0 = rchisq(1,1)
     
-    # calculo mu para linha j
-    mu_j = abs(sqrt(sig2)/(y_j - x_j %*% beta)) 
-    
-    # Calculo x1 e x2
-    x_1 = mu_j + (mu_j^2 * nu_michael_0)/2 - mu_j/2 * (4 * mu_j * nu_michael_0 + mu_j^2 * nu_michael_0^2)^0.5
-    x_2 = mu_j^2 / x_1
-    
-    # decido quem sera escolhido
-    p.treshold = mu_j/(mu_j + x_1)
-    if (runif(1) < p.treshold){
-      x_star = x_1
-    } else{
-      x_star = x_2
+    if(TRUE){
+      #  x1 e x2
+      x_1 = mu_j + (mu_j^2 * nu_michael_0)/2 - mu_j/2 * (4 * mu_j * nu_michael_0 + mu_j^2 * nu_michael_0^2)^0.5
+      x_2 = mu_j^2 / x_1
+      
+      # decide between x_1 and x_2
+      p.treshold = mu_j/(mu_j + x_1)
+      if (runif(1) < p.treshold){
+        x_star = x_1
+      } else{
+        x_star = x_2
+      }
+      
+      # invert x_star
+      lambda_j = 1/x_star
+    }else
+    {
+      lambda_j = statmod::rinvgauss(1, mu_j, shape = 1) 
     }
-
-    lambda_j = 1/x_star
-
-    # lambda_j = statmod::rinvgauss(1, mu_j, shape = 1)
     
     # draw from inverse Gausian
     if (lambda_j >0){
@@ -161,6 +171,10 @@ for (i in 1:(niter)){
   # storing draws
   draws.ng[i,] = c(sig2,beta, lambda)
 }
+
+# end_time <- 
+Sys.time()
+system.time()
 
 draws2 = data.frame(draws.ng[(M0+1):niter,])
 colnames(draws2)

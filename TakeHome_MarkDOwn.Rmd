@@ -49,7 +49,7 @@ $$
 
 ### PART B)
 
-Let $y = (y_1, \dots, y_n)'$ and $X = (x_1, \dots, x_n)'$. Where we have the the following independent priors for $\beta \sim N(\beta_0, V_0)$ and $\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)$. Also let $\mathcal{D} = \{y;X\}$, and $\Lambda$ detnoted as follows
+Let $y = (y_1, \dots, y_n)'$ and $X = (x_1, \dots, x_n)'$. Where we have the the following independent priors for $\beta \sim N(\beta_0, V_0)$ and $\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)$. Also let $\mathcal{D} = \{y;X\}$, and $\Lambda$ be denoted as follows
 $$
 \Lambda  = \begin{bmatrix}\lambda_1 & 0 & \dots & 0 \\ 0 & \lambda_2 & \dots & 0 \\ 0 & \vdots & \ddots & 0 \\ 0 & 0 & 0 & \lambda_n \end{bmatrix}
 $$
@@ -132,9 +132,7 @@ p(z | \psi, \mu) &\propto z^{-2} z^{3 / 2} \exp \left(-\frac{\psi\left(z^{-1}-\m
 & \propto z^{-1 / 2} \exp \left(-\frac{\psi}{2}\left[z+\mu^{-2} z^{-1}\right]\right)
 \end{align}
 
-Then notice that the posterior conditional for $λ_i$, follows that the reciprocal of an $invGauss(1, |\sigma/(y_i − x_i\beta)|)$
-
-Then, a draw of $\lambda_i$ cam be done by inverting a draw from the inverse Gaussian distribution. The the only step is to draw from the inverse Gaussian distribution.
+Then notice that the posterior conditional for $\lambda_i$, follows that the reciprocal of an $invGauss(1, |\sigma/(y_i - x_i\beta)|)$. **This means that a draw of $\lambda_i$ can be done by inverting a draw from the inverse Gaussian distribution.** Then, the only step is to draw from the inverse Gaussian distribution.
 
 Shuster (1968) notes that if $x$ has the inverse Gaussian density, then $\psi(x − \mu)^2/x\mu^2 \sim \chi^2(1)$, a chi-square distribution with one degree of freedom. Let $\nu_2 = \psi(x − \mu)^2/x\mu^2$, them the roots of $nu_2$, denoted here as $x_1$ and $x_2$ are obtained as 
 \begin{align}
@@ -144,3 +142,231 @@ Shuster (1968) notes that if $x$ has the inverse Gaussian density, then $\psi(x 
 
 Michael et al. (1976) use this idea to show that one can obtain a draw from the inverse Gaussian $(\psi, \mu)$ density by first drawing $\nu_2 \sim \chi^2(1)$, calculating the roots $x_1$ and $x_2$ from the preceding equations, and then setting $x$ equal to $x_1$ with probability
 $\mu/(\mu + x_1)$ and equal to x2 with probability $x_1/(\mu + x_1)$.
+
+
+### PART C)
+We now simulate $n = 200$ observations from the above linear regression with double exponential errors model, where $\beta = (0, 1, 2, 3)'$, $\sigma^2 = 1$ and $x_{ij} \sim N(0, 1)$. Afther the simulation we implement the above MCMC scheme and produce posterior summaries of the main parameters. We also try to answer if the simple MH algorithm to sample $\lambda_i$ be reasonable for your simulated data or the full-fledge Gibbs sampler performs better.
+
+
+
+We first load libraries and clear any variables to start with a clear enviroment. 
+```{r, message=FALSE}
+# Libraries
+library(statmod)
+
+# Clear Vars
+rm(list = ls())
+
+```
+
+
+For the Full metropolis hasting we will need to determine the proposal functions and likelihood functions.  
+```{r Functions}
+func_q = function(lambda_i, y_i, x_i, beta, sigma)
+{
+  ret = -0.5*log(lambda_i) -0.5*(lambda_i+( (y_i - x_i %*% beta)/sigma  )^2 * 1/lambda_i)
+  return(ret)
+}
+
+func_F = function(lambda_i, y_i, x_i, beta, sig2)
+{
+  erro = y_i - x_i%*%beta
+  ret = dnorm(erro, mean = 0, sd = (sig2*lambda_i)^0.5, log = TRUE) - lambda_i/2 
+  return(ret)
+}
+```
+
+We now start with the initial setup. We fix a seed por replication porposes, and set the initial values of $X = \{x_{i1}, x_{i2}, x_{i3}, x_{i4} \}_{i=1}^{n}$
+```{r Given_Values}
+# Replication Seed
+set.seed(12345)
+
+# Sample size
+n = 200
+
+# regressors
+nregress = 4
+beta_true = as.matrix(1:nregress, nregress,1)
+
+# Regressors Matrix
+X = matrix(rnorm(nregress*n,0,1), n, nregress)
+
+# Declare of sigma
+sigma_true = 1
+```
+
+We then we proced seting up the simulation. We use a draw form the double exponential for the erros, however a draw for lambda and then the construction of the errors could also be used.
+```{r Simulation}
+# Simulacao
+if(FALSE){
+  lambda_true = rexp(n,1/2)
+  error_true  = rnorm(n, 0, sqrt(sigma_true*lambda_true))
+} else{
+  error_true = nimble::rdexp(n, location = 0, scale = sigma_true)
+}
+
+# Simulation
+Y <- X%*%beta_true + error_true
+```
+
+Ouw first step is to look at the classical OLS estimator.
+```{r OLS}
+# Ols model
+ols = lm(Y ~ X -1);
+sigma2.ols = summary(ols)$sigma^2
+beta.ols = matrix(ols$coefficients, nregress, 1)
+summary(ols)
+
+# histogram
+par(mfrow=c(1,2))
+plot(X%*%beta_true, Y, xlab = "Y predicted", ylab = "Y")
+hist(ols$residuals, breaks=15, main="Histogram of Ols resduals", xlab = "Residuals", ylab = "Frequency")
+
+```
+Now we make the initial setup of the MCMC. We set a *Burn up* sample of size $10^4$, and a final sample of size $10^3$. We also store the draws in a table.
+```{r MCMC_setup}
+# MCMC set-up
+M0    = 1000  # Final
+M     = 10000 # Burn up
+niter = M0+M
+
+
+# TABLE DRAWS
+ncol.draws = 1 + nregress
+draws.ng = matrix(0, nrow = niter, ncol = ncol.draws)
+colnames(draws.ng) = c("sigma", paste("beta", 1:nregress))
+
+```
+
+For the Priors we will set the following. we will assume that $\beta_0 = 0$, this impplies that we do not expect $Y$ to be correlated with $X$, however we are insecure about this fact and assume a standard deviation of 5 for each beta ($V_0 = diag(25)_{n=4}$). For $\sigma^2$ we will set the priors $\sigma_0 = 1$ and $\nu_0 = 2.5$. We also set the initial values for our interations.
+```{r Priors}
+# priors of beta
+beta_0 = matrix(0, nregress, 1)
+V_0 = diag(25, nregress)
+
+# priors of sigma
+sigma2_0 = 1
+nu_0 = 2.5
+
+# initial Values
+sigma2 = sigma2.ols
+beta = beta.ols
+lambda = rep(1,n)
+```
+Then we proceed with the MCMC, one could make the draw from the inverse Gaussian using the *statmod* r package or the procedure done by michael et. al.
+```{r MCMC}
+dt_time = data.frame(Method = c("MH", "GIBBS"), Time = NA)
+for (k in 1:2) {
+  if(k==1)
+  {    MH = TRUE}
+  else
+  {MH=FALSE}
+  
+  begin_time = Sys.time()
+  for (i in 1:(niter)){
+    
+    # Inicialize Lambda^{-1}  matrix
+    Lambda_1 = solve(diag(lambda))
+    
+    # full conditional of sigma2  
+    d0=(nu_0 * sigma2_0)/2
+    par1 = (nu_0 + n)/2
+    par2 = d0 + ( t(Y-X%*%beta) %*% Lambda_1 %*% (Y-X%*%beta) )/2
+    
+    # Conditional distribution of sigma 
+    sig2 = 1/rgamma(1, par1, par2)
+    
+    # full conditional of beta
+    XtX = t(X) %*% Lambda_1 %*% X
+    XtY = t(X) %*% Lambda_1 %*% Y
+    
+    V_1   = solve(XtX/sig2 + solve(V_0))
+    beta_1 = V_1 %*% (XtY/sig2 + solve(V_0) %*% beta_0)
+    beta =  beta_1 + t(chol(V_1)) %*% rnorm(nregress)
+    
+    # Foolowing Koop. (Bayesian Econometrics Methods) pag 260
+    
+    # Draw of lambda
+    for (j in 1:n){
+      y_j = Y[j, 1]
+      x_j = X[j, ]
+      
+      # draw de nu_0
+      nu_michael_0 = rchisq(1,1)
+      
+      # mu for row j
+      mu_j = abs(sqrt(sig2)/(y_j - x_j %*% beta)) 
+      
+      if(TRUE){
+        #  x1 e x2
+        x_1 = mu_j + (mu_j^2 * nu_michael_0)/2 - mu_j/2 * (4 * mu_j * nu_michael_0 + mu_j^2 * nu_michael_0^2)^0.5
+        x_2 = mu_j^2 / x_1
+        
+        # decide between x_1 and x_2
+        p.treshold = mu_j/(mu_j + x_1)
+        if (runif(1) < p.treshold){
+          x_star = x_1
+        } else{
+          x_star = x_2
+        }
+        
+        # invert x_star
+        lambda_j = 1/x_star
+      }else
+      {
+        lambda_j = statmod::rinvgauss(1, mu_j, shape = 1) 
+      }
+      
+      
+      # now the Metropolis-Hasting
+      if ((lambda_j >0) & (MH)){
+        
+        deno = func_F(lambda_j, y_j, x_j, beta, sig2) + func_q(lambda[j], y_j, x_j, beta, sqrt(sig2))
+        nume = func_F(lambda[j], y_j, x_j, beta, sig2) + func_q(lambda_j, y_j, x_j, beta, sqrt(sig2))
+        
+        log.rho = min(0, nume-deno)
+        if (log(runif(1)) < log.rho){
+          lambda[j] = lambda_j
+        }
+      }
+    }
+    
+    # storing draws
+    draws.ng[i,] = c(sig2, beta)
+  }
+  end_time = Sys.time()
+  dt_time[k, "Time"] = end_time - begin_time
+}
+```
+
+We them print the distributions 
+```{r}
+draws2 = data.frame(draws.ng[(M0+1):niter,])
+colnames(draws2)
+summary(draws2$sigma)
+
+par(mfrow=c(1,2))
+hist(draws2$sigma, breaks = 50)
+abline(v=sigma_true, col=2)
+abline(v=sigma2, col="blue")
+acf(draws2$sigma)
+
+par(mfrow=c(1,2))
+hist(draws2$beta.1, breaks = 50)
+abline(v = beta_true[1], col=2)
+abline(v = ols$coefficients[1], col="blue")
+plot(draws2$beta.1,xlab="Iteration",ylab=expression(sigma),main="With DA", type = "l")
+
+par(mfrow=c(1,2))
+hist(draws2$beta.2, breaks = 50)
+abline(v = beta_true[2], col=2)
+abline(v = ols$coefficients[2], col="blue")
+plot(draws2$beta.2,xlab="Iteration",ylab=expression(sigma),main="With DA", type = "l")
+
+par(mfrow=c(1,2))
+hist(draws2$beta.3, breaks = 50)
+abline(v = beta_true[3], col=2)
+abline(v = ols$coefficients[2], col="blue")
+plot(draws2$beta.3,xlab="Iteration",ylab=expression(sigma),main="With DA", type = "l")
+```
+

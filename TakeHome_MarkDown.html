@@ -455,14 +455,58 @@ p(x | \psi, \mu) \propto x^{-3 / 2} \exp \left(-\frac{\psi(x-\mu)^{2}}{2 x \mu^{
 p(z | \psi, \mu) &amp;\propto z^{-2} z^{3 / 2} \exp \left(-\frac{\psi\left(z^{-1}-\mu\right)^{2}}{2 z^{-1} \mu^{2}}\right) \\
 &amp; \propto z^{-1 / 2} \exp \left(-\frac{\psi}{2}\left[z+\mu^{-2} z^{-1}\right]\right)
 \end{align}\]</span></p>
-<p>Then notice that the posterior conditional for <span class="math inline">\(λ_i\)</span>, follows that the reciprocal of an <span class="math inline">\(invGauss(1, |\sigma/(y_i − x_i\beta)|)\)</span></p>
-<p>Then, a draw of <span class="math inline">\(\lambda_i\)</span> cam be done by inverting a draw from the inverse Gaussian distribution. The the only step is to draw from the inverse Gaussian distribution.</p>
+<p>Then notice that the posterior conditional for <span class="math inline">\(λ_i\)</span>, follows that the reciprocal of an <span class="math inline">\(invGauss(1, |\sigma/(y_i − x_i\beta)|)\)</span>. <strong>This means that a draw of <span class="math inline">\(\lambda_i\)</span> can be done by inverting a draw from the inverse Gaussian distribution.</strong> The the only step is to draw from the inverse Gaussian distribution.</p>
 <p>Shuster (1968) notes that if <span class="math inline">\(x\)</span> has the inverse Gaussian density, then <span class="math inline">\(\psi(x − \mu)^2/x\mu^2 \sim \chi^2(1)\)</span>, a chi-square distribution with one degree of freedom. Let <span class="math inline">\(\nu_2 = \psi(x − \mu)^2/x\mu^2\)</span>, them the roots of <span class="math inline">\(nu_2\)</span>, denoted here as <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> are obtained as <span class="math display">\[\begin{align}
 &amp;x_{1}=\mu+\frac{\mu^{2} \nu_{2}}{2 \psi}-\frac{\mu}{2 \psi} \sqrt{4 \mu \psi \nu_{2}+\mu^{2} \nu_{2}^{2}}\\
 &amp;x_{2}=\mu^{2} / x_{1}
 \end{align}\]</span></p>
 <p>Michael et al. (1976) use this idea to show that one can obtain a draw from the inverse Gaussian <span class="math inline">\((\psi, \mu)\)</span> density by first drawing <span class="math inline">\(\nu_2 \sim \chi^2(1)\)</span>, calculating the roots <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> from the preceding equations, and then setting <span class="math inline">\(x\)</span> equal to <span class="math inline">\(x_1\)</span> with probability <span class="math inline">\(\mu/(\mu + x_1)\)</span> and equal to x2 with probability <span class="math inline">\(x_1/(\mu + x_1)\)</span>.</p>
 </div>
+</div>
+<div id="part-c" class="section level3">
+<h3>PART C)</h3>
+<p>We now simulate <span class="math inline">\(n = 200\)</span> observations from the above linear regression with double exponential errors model, where <span class="math inline">\(\beta = (0, 1, 2, 3)&#39;\)</span>, <span class="math inline">\(\sigma^2 = 1\)</span> and <span class="math inline">\(x_{ij} \sim N(0, 1)\)</span>. Afther the simulation we implement the above MCMC scheme and produce posterior summaries of the main parameters. We also try to answer if the simple MH algorithm to sample <span class="math inline">\(\lambda_i\)</span> be reasonable for your simulated data or the full-fledge Gibbs sampler performs better.</p>
+<p>We first load libraries and clear any variables to start with a clear enviroment.</p>
+<pre class="r"><code># Libraries
+library(statmod)
+
+# Clear Vars
+rm(list = ls())</code></pre>
+<p>For the Full metropolis hasting we will need to determine the proposal functions and likelihood functions.</p>
+<pre class="r"><code>func_q = function(lambda_i, y_i, x_i, beta, sigma)
+{
+  ret = -0.5*log(lambda_i) -0.5*(lambda_i+( (y_i - x_i %*% beta)/sigma  )^2 * 1/lambda_i)
+  return(ret)
+}
+
+func_F = function(lambda_i, y_i, x_i, beta, sig2)
+{
+  erro = y_i - x_i%*%beta
+  ret = dnorm(erro, mean = 0, sd = (sig2*lambda_i)^0.5, log = TRUE) - lambda_i/2 
+  return(ret)
+}</code></pre>
+<p>We now start with the initial setup. We fix a seed por replication porposes, and set the initial</p>
+<pre class="r"><code># Semente de randomizacao
+set.seed(12345)
+
+# tamanho da amostra
+n = 100
+
+# Numero de regressores
+nregress = 3
+
+# Simulacao
+lambda_true &lt;- rexp(n,1/2)
+
+sigma_true &lt;- 1
+error_true &lt;- rnorm(n,0,sqrt(sigma_true*lambda_true))
+
+X &lt;- matrix(rnorm(3*n,0,2),100,nregress)
+X[,1] &lt;- 1
+
+beta_true &lt;- as.matrix(rep(runif(nregress),1))
+
+Y &lt;- X%*%beta_true + error_true  </code></pre>
 </div>
 </div>
 
