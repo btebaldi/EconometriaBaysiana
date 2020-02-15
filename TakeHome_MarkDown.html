@@ -470,7 +470,7 @@ p(z | \psi, \mu) &amp;\propto z^{-2} z^{3 / 2} \exp \left(-\frac{\psi\left(z^{-1
 <pre class="r"><code># Libraries
 library(statmod) # Used for Inverse Gausian
 library(nimble)  # Used for double exponential
-library(pracma)  # Used for Time Evaluation
+library(tictoc)  # Used for Time Evaluation
 
 # Clear Vars
 rm(list = ls())</code></pre>
@@ -588,7 +588,7 @@ for (k in 1:2) {
   else
   { MH=FALSE }
   
-  pracma::tic()
+  tictoc::tic(MH)
   for (i in 1:(niter)){
     
     # Inicialize Lambda^{-1}  matrix
@@ -658,6 +658,10 @@ for (k in 1:2) {
         if (log(runif(1)) &lt; log.rho){
           lambda[j] = lambda_j
         }
+      } 
+      else if (!MH)
+      {
+        lambda[j] = lambda_j
       }
     }
     
@@ -670,7 +674,9 @@ for (k in 1:2) {
   }
   
   # Determine Execution Time
-  dt_time[k, &quot;Time&quot;] = pracma::toc()
+  exec_time = tictoc::toc()
+  dt_time[k, &quot;Time&quot;] = exec_time$toc - exec_time$tic
+  rm(list = c(&quot;exec_time&quot;))
   
   # Determine ESS
   if(MH)
@@ -683,8 +689,8 @@ for (k in 1:2) {
   }
   
 }</code></pre>
-<pre><code>## elapsed time is 78.940000 seconds 
-## elapsed time is 44.750000 seconds</code></pre>
+<pre><code>## TRUE: 76.88 sec elapsed
+## FALSE: 44.03 sec elapsed</code></pre>
 <pre class="r"><code># Determine the ess per second
 dt_time$ess_ps = dt_time$ess / dt_time$Time</code></pre>
 <p>We them print the distributions</p>
@@ -732,8 +738,8 @@ plot(draws2$beta.3, xlab=&quot;Iteration&quot;, ylab=&quot;beta_4&quot;,main=&qu
 <p>Lastily we evaluate if MH perform better. We present the following table.</p>
 <pre class="r"><code>dt_time</code></pre>
 <pre><code>##   Method  Time   ess   ess_ps
-## 1     MH 78.94 46475 588.7383
-## 2  GIBBS 44.75 37775 844.1341</code></pre>
+## 1     MH 76.88 46475 604.5135
+## 2  GIBBS 44.03  7443 169.0438</code></pre>
 </div>
 </div>
 
