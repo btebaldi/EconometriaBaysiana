@@ -1,8 +1,10 @@
 ---
 title: "Econometria Baysiana - Take Home Exam"
-Auhtor: "B"
 date: "13/02/2020"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
+author: Bruno Barbosa
 ---
 
 ```{r setup, include=FALSE}
