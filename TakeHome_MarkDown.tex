@@ -1,0 +1,696 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Econometria Baysiana - Take Home Exam},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\title{Econometria Baysiana - Take Home Exam}
+\author{}
+\date{\vspace{-2.5em}13/02/2020}
+
+\begin{document}
+\maketitle
+
+\hypertarget{question}{%
+\subsection{Question}\label{question}}
+
+Consider the regression model \(y_i = x_i'\beta + \epsilon_i0\)
+\(\epsilon_i | \lambda_i ,\sigma^2 \sim N(0, \lambda_i\sigma^2)\) where
+\(x_i = (1, x_{i1}, \dots, x_{iq})'\) is a p-dimensional vector of
+regressors (constant plus q attributes or characteristics) and the
+following hierarchical prior for the scale-mixing variables
+\(\lambda_i\): \begin{equation}
+\lambda_1, \dots, \lambda_n \sim \text{iid Exponential(1/2)}
+\end{equation}
+
+\hypertarget{part-a}{%
+\subsubsection{PART A)}\label{part-a}}
+
+We will show that \begin{equation}
+p\left(\epsilon_{i} | \sigma^{2}\right)=\int_{0}^{\infty} p\left(\epsilon_{i} | \lambda_{i}, \sigma^{2}\right) p\left(\lambda_{i}\right) d \lambda_{i}=\frac{1}{2 \sigma} \exp \left\{-\frac{\left|\epsilon_{i}\right|}{\sigma}\right\}
+\end{equation}
+
+First consider \(p\left(\epsilon_{i} | \sigma^{2}\right)\), then we must
+have that: \begin{align}
+p\left(\epsilon_{i} | \sigma^{2}\right) &=\int_{0}^{\infty} p\left(\epsilon_{i} | \lambda_{i}, \sigma^{2}\right) p\left(\lambda_{i}\right) d \lambda_{i} \\
+&=\int_{0}^{\infty}\left(2 \pi \lambda_{i} \sigma^{2}\right)^{-1 / 2} \exp \left[-\epsilon_{i}^{2} /\left(2 \lambda_{i} \sigma^{2}\right)\right](1 / 2) \exp \left(-\lambda_{i} / 2\right) d \lambda_{i} \\
+&=(1 / 2)\left(2 \pi \sigma^{2}\right)^{-1 / 2} \int_{0}^{\infty} \lambda_{i}^{-1 / 2} \exp \left[-(1 / 2)\left(\lambda_{i}+\left[\epsilon_{i} / \sigma\right]^{2} \lambda_{i}^{-1}\right)\right] d \lambda_{i}
+\end{align}
+
+Now, make a change of variable and let \(\psi_i = \lambda_i^{1/2}\). We
+can then express this integral as \[\begin{equation}
+p\left(\epsilon_{i} | \sigma^{2}\right)=\left(2 \pi \sigma^{2}\right)^{-1 / 2} \int_{0}^{\infty} \exp \left(-[1 / 2]\left(\psi_{i}^{2}+\left[\epsilon_{i} / \sigma\right]^{2} \psi_{i}^{-2}\right)\right) d \psi_{i}
+\end{equation}\]
+
+The integral in above can be evaluated analytically. Using the following
+result from Andrews and Mallows (1974) \[
+\int_{0}^{\infty} \exp \left\{-0.5\left(a^{2} u^{2}+b^{2} u^{-2}\right)\right\} d u=\left(\frac{\pi}{2 a^{2}}\right)^{1/2} \exp \{-|a b|\}
+\] Then \(a=1\), \(b=\epsilon_i/\sigma\), and \(u = \psi_i\)
+
+\[
+p\left(\epsilon_{i} | \sigma^{2}\right)=\left(2 \pi \sigma^{2}\right)^{-1 / 2} \left(\frac{\pi}{2}\right)^{1/2} \exp\{-|\epsilon_i/\sigma|\} =\frac{1}{2\sigma} \exp\left\{-\frac{|\epsilon_i|}{\sigma}\right\}
+\]
+
+\hypertarget{part-b}{%
+\subsubsection{PART B)}\label{part-b}}
+
+Let \(y = (y_1, \dots, y_n)'\) and \(X = (x_1, \dots, x_n)'\). Where we
+have the the following independent priors for
+\(\beta \sim N(\beta_0, V_0)\) and
+\(\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)\).
+Also let \(\mathcal{D} = \{y;X\}\), and \(\Lambda\) be denoted as
+follows \[
+\Lambda  = \begin{bmatrix}\lambda_1 & 0 & \dots & 0 \\ 0 & \lambda_2 & \dots & 0 \\ 0 & \vdots & \ddots & 0 \\ 0 & 0 & 0 & \lambda_n \end{bmatrix}
+\] To implement the Gibbs sampler we need to obtain the complete
+posterior conditionals for the parameters \(\beta\), \(\sigma^2\), and
+\(\{\lambda_i\}_{i=1}^{n}\) and cycle through the posteriors conditional
+distributions. The joint posterior distribution is given as
+\begin{equation}
+p\left(\beta,\left\{\lambda_{i}\right\}, \sigma^{2} | y\right) \propto\left[\prod_{i=1}^{n} \phi\left(y_{i} ; x_{i} \beta, \lambda_{i} \sigma^{2}\right) p\left(\lambda_{i}\right)\right] p(\beta) p\left(\sigma^{2}\right)
+\end{equation}
+
+We know that traditional GLS have that
+\(\beta = (X^T\Lambda^{-1}X)^{-1}X^T\Lambda^{-1}y\). If
+\(\beta \sim N(\beta_0, V_0)\), and
+\(\sigma^2 \sim IG\left(\frac{\nu_0}{2}, \frac{\nu_0 \sigma_0^2}{2}\right)\)
+then from the joint posterior, the following complete conditional
+posterior distributions are obtained:
+
+\hypertarget{the-beta-conditional-distribution-beta-lambda_i-sigma2-mathcald}{%
+\paragraph{\texorpdfstring{The \(\beta\) conditional distribution
+(\(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\))}{The \textbackslash beta conditional distribution (\textbackslash beta \textbar{} \textbackslash\{\textbackslash lambda\_i\textbackslash\}, \textbackslash sigma\^{}2, \textbackslash mathcal\{D\})}}\label{the-beta-conditional-distribution-beta-lambda_i-sigma2-mathcald}}
+
+\[
+\begin{align}
+p\left(y | X, \beta, \sigma^{2}, \{\lambda_i\}\right) 
+&\propto \exp \left\{-\frac{1}{2 \sigma^{2}} \sum_{i=1}^{n} \hat\epsilon_i^2 \right\} \\
+&\propto \exp \left\{-\frac{1}{2 \sigma^{2}}\left[y^{T} y-2 \beta^{T} X^{T}\Lambda^{-1} y+\beta^{T} X^{T}\Lambda^{-1} X \beta\right]\right\} \\
+p\left(\beta | \{\lambda_i\}, \sigma^2, \mathcal{D}\right) &\propto p\left(y | X, \beta, \sigma^{2}\right) \times p(\beta) \\
+&\propto \exp \left\{-\frac{1}{2\sigma^2}\left(-2 \beta^{T} X^{T}\Lambda^{-1} y +\beta^{T} X^{T}\Lambda^{-1} X \beta \right)-\frac{1}{2}\left(-2 \beta^{T} V_{0}^{-1} \beta_{0}+\beta^{T} V_{0}^{-1} \beta\right)\right\} \\
+&\propto 
+\exp \left\{-\frac{1}{2}\left(-2 \beta^{T} (X^{T}\Lambda^{-1} y/\sigma^2 +V_{0}^{-1} \beta_{0})+ \beta^{T} (X^{T}\Lambda^{-1} X/\sigma^2 +V_{0}^{-1} ) \beta \right)
+\right\}
+\end{align}
+\] we recognize this as being proportional to a multivariate normal
+density, with \[
+\begin{align}
+\beta | \{\lambda_i\}, \sigma^2, \mathcal{D} \sim N(\beta_1, V_1) \\
+\beta_{1}=V_{1}\left(X^{\prime} \Lambda^{-1} y/\sigma^2+V_{0}^{-1} \beta_{0}\right) \qquad V_{1}=\left(X^{\prime} \Lambda^{-1} X / \sigma^{2}+V_{0}^{-1}\right)^{-1}
+\end{align}
+\]
+
+\hypertarget{the-sigma2-conditional-distribution-sigma2-lambda-mathcald-beta}{%
+\paragraph{\texorpdfstring{The \(\sigma^2\) conditional distribution
+(\(\sigma^2| \Lambda, \mathcal{D}, \beta\))}{The \textbackslash sigma\^{}2 conditional distribution (\textbackslash sigma\^{}2\textbar{} \textbackslash Lambda, \textbackslash mathcal\{D\}, \textbackslash beta)}}\label{the-sigma2-conditional-distribution-sigma2-lambda-mathcald-beta}}
+
+As in most normal sampling problems, the semiconjugate prior
+distribution for \(\sigma^2\) is an inverse-gamma distribution. Letting
+\(\gamma = 1/\sigma^2\) be the measurement precision, this implies that
+\(\gamma \sim G\left(\frac{\nu_0}{2}, \frac{\nu_0\sigma_0^2}{2}\right)\)
+then \[
+\begin{align}
+p(\gamma | \mathcal{D}, \beta) & \propto p(\gamma) p(y | X, \beta, \gamma) \\
+& \propto\left[\gamma^{\nu_{0} / 2-1} \exp \left\{-\gamma \times \frac{ \nu_{0} \sigma_{0}^{2}}{2}\right\}\right] \times\left[\gamma^{\frac{n}{2}} \exp \left\{- \frac{\gamma  }{2} \sum_{i=1}^{n} \hat\epsilon_i^2\right\}\right] \\
+& \propto\gamma^{\left(\nu_{0}+n\right) / 2-1} \exp \left\{-\gamma\left[\nu_{0} \sigma_{0}^{2}+\sum_{i=1}^{n} \hat\epsilon_i^2\right] / 2\right\}
+\end{align}
+\] which we recognize as a gamma density, so that \[
+\sigma^2| \Lambda, \mathcal{D}, \beta \sim IG\left(\frac{\nu_0 + n}{2}, \frac{\nu_0 \sigma_0^2 + \sum_{i=1}^{n} \hat\epsilon_i^2}{2}\right)
+\] Recall that
+\(\sum_{i=1}^{n} \hat\epsilon_i^2 = (y - X\beta)^T\Lambda^{-1}(y-x\beta)\)
+\[
+\begin{align}
+\sigma^2| \Lambda, \mathcal{D}, \beta &\sim IG\left(\frac{\nu_0 + n}{2}, \frac{\nu_0 \sigma_0^2 + (y - X\beta)^T\Lambda^{-1}(y-x\beta)}{2}\right) \\
+\sigma^2| \Lambda, \mathcal{D}, \beta &\sim IG\left(\frac{\nu_1}{2}, \frac{\nu_1 \sigma_1^2}{2}\right) \\
+&\nu_1 = \nu_0 + n \qquad \nu_1\sigma_1^2 = \nu_0\sigma_0^2 + (y - X\beta)^T\Lambda^{-1}(y-x\beta)
+\end{align}
+\]
+
+\hypertarget{the-lambda_i-conditional-distribution-lambda_i-beta-sigma2-mathcald}{%
+\paragraph{\texorpdfstring{The \(\lambda_{i}\) conditional distribution
+(\(\lambda_{i} | \beta, \sigma^{2}, \mathcal{D}\))}{The \textbackslash lambda\_\{i\} conditional distribution (\textbackslash lambda\_\{i\} \textbar{} \textbackslash beta, \textbackslash sigma\^{}\{2\}, \textbackslash mathcal\{D\})}}\label{the-lambda_i-conditional-distribution-lambda_i-beta-sigma2-mathcald}}
+
+Lastly we have that \begin{align}
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &\propto p\left( y_{i}| \lambda_{i}, \beta, \sigma^{2}, x_{i}\right) p(\lambda_{i}) \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &\propto \frac{1}{\sqrt{2\pi \sigma^2 \lambda} }\exp \left\{-\frac{1}{2}\left(\left(y_{i}-x_{i}^{T} \beta\right)^{2} \sigma^{-2}\lambda_{i}^{-1}\right)\right\} \exp \left\{-0.5 \lambda_{i}\right\} \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &\propto \lambda^{-1 / 2} \exp \left\{-0.5 \lambda_{i}\right\} 
+\exp \left\{-0.5\left(\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\} \\
+p\left(\lambda_{i} | \beta, \sigma^{2}, y_{i}, x_{i}\right) &\propto \lambda^{-1 / 2} \exp \left\{-0.5\left(\lambda_{i}+\left(\frac{y_{i}-x_{i}^{\prime} \beta}{\sigma}\right)^{2} \lambda_{i}^{-1}\right)\right\}
+\end{align}
+
+We claim that this distribution is of the generalized inverse Gaussian
+(GIG) form. Following Shuster (1968), Michael, et. al.~(1976), and
+Carlin and Polson (1991), we outline a strategy for obtaining a draw
+from this GIG density.
+
+We say that \(x\) follows an inverse Gaussian distribution
+(\(x \sim invGauss(\psi, \mu)\)) if \begin{equation}
+p(x | \psi, \mu) \propto x^{-3 / 2} \exp \left(-\frac{\psi(x-\mu)^{2}}{2 x \mu^{2}}\right), \quad x>0
+\end{equation}
+
+Now, let \(z = x^{−1}\). It follows by a change of variables that
+\begin{align}
+p(z | \psi, \mu) &\propto z^{-2} z^{3 / 2} \exp \left(-\frac{\psi\left(z^{-1}-\mu\right)^{2}}{2 z^{-1} \mu^{2}}\right) \\
+& \propto z^{-1 / 2} \exp \left(-\frac{\psi}{2}\left[z+\mu^{-2} z^{-1}\right]\right)
+\end{align}
+
+Then notice that the posterior conditional for \(\lambda_i\), follows
+that the reciprocal of an \(invGauss(1, |\sigma/(y_i - x_i\beta)|)\).
+\textbf{This means that a draw of \(\lambda_i\) can be done by inverting
+a draw from the inverse Gaussian distribution.} Then, the only step is
+to draw from the inverse Gaussian distribution.
+
+Shuster (1968) notes that if \(x\) has the inverse Gaussian density,
+then \(\psi(x − \mu)^2/x\mu^2 \sim \chi^2(1)\), a chi-square
+distribution with one degree of freedom. Let
+\(\nu_2 = \psi(x − \mu)^2/x\mu^2\), them the roots of \(nu_2\), denoted
+here as \(x_1\) and \(x_2\) are obtained as \begin{align}
+&x_{1}=\mu+\frac{\mu^{2} \nu_{2}}{2 \psi}-\frac{\mu}{2 \psi} \sqrt{4 \mu \psi \nu_{2}+\mu^{2} \nu_{2}^{2}}\\
+&x_{2}=\mu^{2} / x_{1}
+\end{align}
+
+Michael et al.~(1976) use this idea to show that one can obtain a draw
+from the inverse Gaussian \((\psi, \mu)\) density by first drawing
+\(\nu_2 \sim \chi^2(1)\), calculating the roots \(x_1\) and \(x_2\) from
+the preceding equations, and then setting \(x\) equal to \(x_1\) with
+probability \(\mu/(\mu + x_1)\) and equal to x2 with probability
+\(x_1/(\mu + x_1)\).
+
+\hypertarget{part-c}{%
+\subsubsection{PART C)}\label{part-c}}
+
+We now simulate \(n = 200\) observations from the above linear
+regression with double exponential errors model, where
+\(\beta = (0, 1, 2, 3)'\), \(\sigma^2 = 1\) and \(x_{ij} \sim N(0, 1)\).
+Afther the simulation we implement the above MCMC scheme and produce
+posterior summaries of the main parameters. We also try to answer if the
+simple MH algorithm to sample \(\lambda_i\) be reasonable for your
+simulated data or the full-fledge Gibbs sampler performs better.
+
+We first load libraries and clear any variables to start with a clear
+enviroment.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Libraries}
+\KeywordTok{library}\NormalTok{(statmod) }\CommentTok{# Used for Inverse Gausian}
+\KeywordTok{library}\NormalTok{(nimble)  }\CommentTok{# Used for double exponential}
+\KeywordTok{library}\NormalTok{(tictoc)  }\CommentTok{# Used for Time Evaluation}
+
+\CommentTok{# Clear Vars}
+\KeywordTok{rm}\NormalTok{(}\DataTypeTok{list =} \KeywordTok{ls}\NormalTok{())}
+\end{Highlighting}
+\end{Shaded}
+
+For the Full metropolis hasting we will need to determine the proposal
+functions and likelihood functions.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{func_q =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(lambda_i, y_i, x_i, beta, sigma)}
+\NormalTok{\{}
+\NormalTok{  ret =}\StringTok{ }\FloatTok{-0.5}\OperatorTok{*}\KeywordTok{log}\NormalTok{(lambda_i) }\FloatTok{-0.5}\OperatorTok{*}\NormalTok{(lambda_i}\OperatorTok{+}\NormalTok{( (y_i }\OperatorTok{-}\StringTok{ }\NormalTok{x_i }\OperatorTok{%*%}\StringTok{ }\NormalTok{beta)}\OperatorTok{/}\NormalTok{sigma  )}\OperatorTok{^}\DecValTok{2} \OperatorTok{*}\StringTok{ }\DecValTok{1}\OperatorTok{/}\NormalTok{lambda_i)}
+  \KeywordTok{return}\NormalTok{(ret)}
+\NormalTok{\}}
+
+\NormalTok{func_F =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(lambda_i, y_i, x_i, beta, sig2)}
+\NormalTok{\{}
+\NormalTok{  erro =}\StringTok{ }\NormalTok{y_i }\OperatorTok{-}\StringTok{ }\NormalTok{x_i}\OperatorTok{%*%}\NormalTok{beta}
+\NormalTok{  ret =}\StringTok{ }\KeywordTok{dnorm}\NormalTok{(erro, }\DataTypeTok{mean =} \DecValTok{0}\NormalTok{, }\DataTypeTok{sd =}\NormalTok{ (sig2}\OperatorTok{*}\NormalTok{lambda_i)}\OperatorTok{^}\FloatTok{0.5}\NormalTok{, }\DataTypeTok{log =} \OtherTok{TRUE}\NormalTok{) }\OperatorTok{-}\StringTok{ }\NormalTok{lambda_i}\OperatorTok{/}\DecValTok{2} 
+  \KeywordTok{return}\NormalTok{(ret)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+We now start with the initial setup. We fix a seed por replication
+porposes, and set the initial values of
+\(X = \{x_{i1}, x_{i2}, x_{i3}, x_{i4} \}_{i=1}^{n}\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Replication Seed}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{12345}\NormalTok{)}
+
+\CommentTok{# Sample size}
+\NormalTok{n =}\StringTok{ }\DecValTok{200}
+
+\CommentTok{# regressors}
+\NormalTok{nregress =}\StringTok{ }\DecValTok{4}
+\NormalTok{beta_true =}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(}\DecValTok{0}\OperatorTok{:}\NormalTok{(nregress}\DecValTok{-1}\NormalTok{), nregress,}\DecValTok{1}\NormalTok{)}
+
+\CommentTok{# Regressors Matrix}
+\NormalTok{X =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{rnorm}\NormalTok{(nregress}\OperatorTok{*}\NormalTok{n,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{), n, nregress)}
+
+\CommentTok{# Declare of sigma}
+\NormalTok{sigma_true =}\StringTok{ }\DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+We then we proced seting up the simulation. We use a draw form the
+double exponential for the erros, however a draw for lambda and then the
+construction of the errors could also be used.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# We opt to use the Double exponential extrection}
+\NormalTok{USE_DOUBLE_EXP =}\StringTok{ }\OtherTok{TRUE}
+
+\CommentTok{# Simulacao}
+\ControlFlowTok{if}\NormalTok{(USE_DOUBLE_EXP)\{}
+\NormalTok{  error_true =}\StringTok{ }\NormalTok{nimble}\OperatorTok{::}\KeywordTok{rdexp}\NormalTok{(n, }\DataTypeTok{location =} \DecValTok{0}\NormalTok{, }\DataTypeTok{scale =}\NormalTok{ sigma_true)}
+\NormalTok{\} }\ControlFlowTok{else}
+\NormalTok{\{}
+\NormalTok{  lambda_true =}\StringTok{ }\KeywordTok{rexp}\NormalTok{(n,}\DecValTok{1}\OperatorTok{/}\DecValTok{2}\NormalTok{)}
+\NormalTok{  error_true  =}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(n, }\DecValTok{0}\NormalTok{, }\KeywordTok{sqrt}\NormalTok{(sigma_true}\OperatorTok{*}\NormalTok{lambda_true))}
+\NormalTok{\}}
+
+\CommentTok{# Simulation}
+\NormalTok{Y <-}\StringTok{ }\NormalTok{X}\OperatorTok{%*%}\NormalTok{beta_true }\OperatorTok{+}\StringTok{ }\NormalTok{error_true}
+\end{Highlighting}
+\end{Shaded}
+
+Ouw first step is to look at the classical OLS estimator.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Ols model}
+\NormalTok{ols =}\StringTok{ }\KeywordTok{lm}\NormalTok{(Y }\OperatorTok{~}\StringTok{ }\NormalTok{X }\DecValTok{-1}\NormalTok{);}
+\NormalTok{sigma2.ols =}\StringTok{ }\KeywordTok{summary}\NormalTok{(ols)}\OperatorTok{$}\NormalTok{sigma}\OperatorTok{^}\DecValTok{2}
+\NormalTok{beta.ols =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(ols}\OperatorTok{$}\NormalTok{coefficients, nregress, }\DecValTok{1}\NormalTok{)}
+\KeywordTok{summary}\NormalTok{(ols)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Y ~ X - 1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.6968 -0.7314  0.1168  0.7823  4.7151 
+## 
+## Coefficients:
+##    Estimate Std. Error t value Pr(>|t|)    
+## X1 -0.03397    0.08843  -0.384    0.701    
+## X2  0.86260    0.09895   8.718  1.2e-15 ***
+## X3  1.96746    0.09744  20.191  < 2e-16 ***
+## X4  2.93288    0.09408  31.175  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.338 on 196 degrees of freedom
+## Multiple R-squared:  0.8689, Adjusted R-squared:  0.8663 
+## F-statistic: 324.9 on 4 and 196 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# histogram}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\KeywordTok{plot}\NormalTok{(X}\OperatorTok{%*%}\NormalTok{beta_true, Y, }\DataTypeTok{xlab =} \StringTok{"Y predicted"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Y"}\NormalTok{)}
+\KeywordTok{hist}\NormalTok{(ols}\OperatorTok{$}\NormalTok{residuals, }\DataTypeTok{breaks=}\DecValTok{15}\NormalTok{, }\DataTypeTok{main=}\StringTok{"Histogram of Ols residuals"}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"Residuals"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Frequency"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{TakeHome_MarkDown_files/figure-latex/OLS-1.pdf}
+
+Now we make the initial setup of the MCMC. We set a \emph{Burn up}
+sample of size \(10^4\), and a final sample of size \(10^3\). We also
+store the draws in a table.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# MCMC set-up}
+\NormalTok{M0    =}\StringTok{ }\DecValTok{1000}  \CommentTok{# Final}
+\NormalTok{M     =}\StringTok{ }\DecValTok{10000} \CommentTok{# Burn up}
+\NormalTok{niter =}\StringTok{ }\NormalTok{M0}\OperatorTok{+}\NormalTok{M}
+
+
+\CommentTok{# TABLE DRAWS}
+\NormalTok{ncol.draws =}\StringTok{ }\DecValTok{1} \OperatorTok{+}\StringTok{ }\NormalTok{nregress}
+\NormalTok{draws.mc =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DataTypeTok{nrow =}\NormalTok{ niter, }\DataTypeTok{ncol =}\NormalTok{ ncol.draws)}
+\KeywordTok{colnames}\NormalTok{(draws.mc) =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"sigma"}\NormalTok{, }\KeywordTok{paste}\NormalTok{(}\StringTok{"beta"}\NormalTok{, }\DecValTok{1}\OperatorTok{:}\NormalTok{nregress))}
+
+\NormalTok{draws.gibbs =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DataTypeTok{nrow =}\NormalTok{ niter, }\DataTypeTok{ncol =}\NormalTok{ ncol.draws)}
+\KeywordTok{colnames}\NormalTok{(draws.gibbs) =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"sigma"}\NormalTok{, }\KeywordTok{paste}\NormalTok{(}\StringTok{"beta"}\NormalTok{, }\DecValTok{1}\OperatorTok{:}\NormalTok{nregress))}
+\end{Highlighting}
+\end{Shaded}
+
+For the Priors we will set the following. we will assume that
+\(\beta_0 = 0\), this impplies that we do not expect \(Y\) to be
+correlated with \(X\), however we are insecure about this fact and
+assume a standard deviation of 5 for each beta
+(\(V_0 = diag(25)_{n=4}\)). For \(\sigma^2\) we will set the priors
+\(\sigma_0 = 1\) and \(\nu_0 = 2.5\). We also set the initial values for
+our interations.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# priors of beta}
+\NormalTok{beta_}\DecValTok{0}\NormalTok{ =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{, nregress, }\DecValTok{1}\NormalTok{)}
+\NormalTok{V_}\DecValTok{0}\NormalTok{ =}\StringTok{ }\KeywordTok{diag}\NormalTok{(}\DecValTok{25}\NormalTok{, nregress)}
+
+\CommentTok{# priors of sigma}
+\NormalTok{sigma2_}\DecValTok{0}\NormalTok{ =}\StringTok{ }\DecValTok{1}
+\NormalTok{nu_}\DecValTok{0}\NormalTok{ =}\StringTok{ }\FloatTok{2.5}
+
+\CommentTok{# initial Values}
+\NormalTok{sigma2 =}\StringTok{ }\NormalTok{sigma2.ols}
+\NormalTok{beta =}\StringTok{ }\NormalTok{beta.ols}
+\NormalTok{lambda =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,n)}
+\end{Highlighting}
+\end{Shaded}
+
+Then we proceed with the MCMC, one could make the draw from the inverse
+Gaussian using the \emph{statmod} r package or the procedure done by
+michael et. al.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# We opt to use Michael method}
+\NormalTok{USE_MICHAEL_METHOD =}\StringTok{ }\OtherTok{TRUE}
+
+\CommentTok{# table to store execution time}
+\NormalTok{dt_time =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{Method =} \KeywordTok{c}\NormalTok{(}\StringTok{"MH"}\NormalTok{, }\StringTok{"GIBBS"}\NormalTok{), }\DataTypeTok{Time =} \OtherTok{NA}\NormalTok{, }\DataTypeTok{ess=}\OtherTok{NA}\NormalTok{, }\DataTypeTok{ess_ps =} \OtherTok{NA}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (k }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{) \{}
+  \ControlFlowTok{if}\NormalTok{(k}\OperatorTok{==}\DecValTok{1}\NormalTok{)}
+\NormalTok{  \{ MH =}\StringTok{ }\OtherTok{TRUE}\NormalTok{ \}}
+  \ControlFlowTok{else}
+\NormalTok{  \{ MH=}\OtherTok{FALSE}\NormalTok{ \}}
+  
+\NormalTok{  tictoc}\OperatorTok{::}\KeywordTok{tic}\NormalTok{(MH)}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{(niter))\{}
+    
+    \CommentTok{# Inicialize Lambda^\{-1\}  matrix}
+\NormalTok{    Lambda_}\DecValTok{1}\NormalTok{ =}\StringTok{ }\KeywordTok{solve}\NormalTok{(}\KeywordTok{diag}\NormalTok{(lambda))}
+    
+    \CommentTok{# full conditional of sigma2  }
+\NormalTok{    d0=(nu_}\DecValTok{0} \OperatorTok{*}\StringTok{ }\NormalTok{sigma2_}\DecValTok{0}\NormalTok{)}\OperatorTok{/}\DecValTok{2}
+\NormalTok{    par1 =}\StringTok{ }\NormalTok{(nu_}\DecValTok{0} \OperatorTok{+}\StringTok{ }\NormalTok{n)}\OperatorTok{/}\DecValTok{2}
+\NormalTok{    par2 =}\StringTok{ }\NormalTok{d0 }\OperatorTok{+}\StringTok{ }\NormalTok{( }\KeywordTok{t}\NormalTok{(Y}\OperatorTok{-}\NormalTok{X}\OperatorTok{%*%}\NormalTok{beta) }\OperatorTok{%*%}\StringTok{ }\NormalTok{Lambda_}\DecValTok{1} \OperatorTok{%*%}\StringTok{ }\NormalTok{(Y}\OperatorTok{-}\NormalTok{X}\OperatorTok{%*%}\NormalTok{beta) )}\OperatorTok{/}\DecValTok{2}
+    
+    \CommentTok{# Conditional distribution of sigma }
+\NormalTok{    sig2 =}\StringTok{ }\DecValTok{1}\OperatorTok{/}\KeywordTok{rgamma}\NormalTok{(}\DecValTok{1}\NormalTok{, par1, par2)}
+    
+    \CommentTok{# full conditional of beta}
+\NormalTok{    XtX =}\StringTok{ }\KeywordTok{t}\NormalTok{(X) }\OperatorTok{%*%}\StringTok{ }\NormalTok{Lambda_}\DecValTok{1} \OperatorTok{%*%}\StringTok{ }\NormalTok{X}
+\NormalTok{    XtY =}\StringTok{ }\KeywordTok{t}\NormalTok{(X) }\OperatorTok{%*%}\StringTok{ }\NormalTok{Lambda_}\DecValTok{1} \OperatorTok{%*%}\StringTok{ }\NormalTok{Y}
+    
+\NormalTok{    V_}\DecValTok{1}\NormalTok{   =}\StringTok{ }\KeywordTok{solve}\NormalTok{(XtX}\OperatorTok{/}\NormalTok{sig2 }\OperatorTok{+}\StringTok{ }\KeywordTok{solve}\NormalTok{(V_}\DecValTok{0}\NormalTok{))}
+\NormalTok{    beta_}\DecValTok{1}\NormalTok{ =}\StringTok{ }\NormalTok{V_}\DecValTok{1} \OperatorTok{%*%}\StringTok{ }\NormalTok{(XtY}\OperatorTok{/}\NormalTok{sig2 }\OperatorTok{+}\StringTok{ }\KeywordTok{solve}\NormalTok{(V_}\DecValTok{0}\NormalTok{) }\OperatorTok{%*%}\StringTok{ }\NormalTok{beta_}\DecValTok{0}\NormalTok{)}
+\NormalTok{    beta =}\StringTok{  }\NormalTok{beta_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\KeywordTok{t}\NormalTok{(}\KeywordTok{chol}\NormalTok{(V_}\DecValTok{1}\NormalTok{)) }\OperatorTok{%*%}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(nregress)}
+    
+    \CommentTok{# Foolowing Koop. (Bayesian Econometrics Methods) pag 260}
+    
+    \CommentTok{# Draw of lambda}
+    \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{n)\{}
+\NormalTok{      y_j =}\StringTok{ }\NormalTok{Y[j, }\DecValTok{1}\NormalTok{]}
+\NormalTok{      x_j =}\StringTok{ }\NormalTok{X[j, ]}
+      
+      \CommentTok{# draw de nu_0}
+\NormalTok{      nu_michael_}\DecValTok{0}\NormalTok{ =}\StringTok{ }\KeywordTok{rchisq}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+      
+      \CommentTok{# mu for row j}
+\NormalTok{      mu_j =}\StringTok{ }\KeywordTok{abs}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(sig2)}\OperatorTok{/}\NormalTok{(y_j }\OperatorTok{-}\StringTok{ }\NormalTok{x_j }\OperatorTok{%*%}\StringTok{ }\NormalTok{beta)) }
+      
+      \ControlFlowTok{if}\NormalTok{(USE_MICHAEL_METHOD)\{}
+        \CommentTok{#  x1 e x2}
+\NormalTok{        x_}\DecValTok{1}\NormalTok{ =}\StringTok{ }\NormalTok{mu_j }\OperatorTok{+}\StringTok{ }\NormalTok{(mu_j}\OperatorTok{^}\DecValTok{2} \OperatorTok{*}\StringTok{ }\NormalTok{nu_michael_}\DecValTok{0}\NormalTok{)}\OperatorTok{/}\DecValTok{2} \OperatorTok{-}\StringTok{ }\NormalTok{mu_j}\OperatorTok{/}\DecValTok{2} \OperatorTok{*}\StringTok{ }\NormalTok{(}\DecValTok{4} \OperatorTok{*}\StringTok{ }\NormalTok{mu_j }\OperatorTok{*}\StringTok{ }\NormalTok{nu_michael_}\DecValTok{0} \OperatorTok{+}\StringTok{ }\NormalTok{mu_j}\OperatorTok{^}\DecValTok{2} \OperatorTok{*}\StringTok{ }\NormalTok{nu_michael_}\DecValTok{0}\OperatorTok{^}\DecValTok{2}\NormalTok{)}\OperatorTok{^}\FloatTok{0.5}
+\NormalTok{        x_}\DecValTok{2}\NormalTok{ =}\StringTok{ }\NormalTok{mu_j}\OperatorTok{^}\DecValTok{2} \OperatorTok{/}\StringTok{ }\NormalTok{x_}\DecValTok{1}
+        
+        \CommentTok{# decide between x_1 and x_2}
+\NormalTok{        p.treshold =}\StringTok{ }\NormalTok{mu_j}\OperatorTok{/}\NormalTok{(mu_j }\OperatorTok{+}\StringTok{ }\NormalTok{x_}\DecValTok{1}\NormalTok{)}
+        \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{runif}\NormalTok{(}\DecValTok{1}\NormalTok{) }\OperatorTok{<}\StringTok{ }\NormalTok{p.treshold)}
+\NormalTok{        \{}
+\NormalTok{          x_star =}\StringTok{ }\NormalTok{x_}\DecValTok{1}
+\NormalTok{        \}}
+        \ControlFlowTok{else}
+\NormalTok{        \{}
+\NormalTok{          x_star =}\StringTok{ }\NormalTok{x_}\DecValTok{2}
+\NormalTok{        \}}
+        
+        \CommentTok{# invert x_star}
+\NormalTok{        lambda_j =}\StringTok{ }\DecValTok{1}\OperatorTok{/}\NormalTok{x_star}
+\NormalTok{      \}}
+      \ControlFlowTok{else}
+\NormalTok{      \{}
+\NormalTok{        lambda_j =}\StringTok{ }\NormalTok{statmod}\OperatorTok{::}\KeywordTok{rinvgauss}\NormalTok{(}\DecValTok{1}\NormalTok{, mu_j, }\DataTypeTok{shape =} \DecValTok{1}\NormalTok{) }
+\NormalTok{      \}}
+      
+      
+      \CommentTok{# now the Metropolis-Hasting}
+      \ControlFlowTok{if}\NormalTok{ ((lambda_j }\OperatorTok{>}\DecValTok{0}\NormalTok{) }\OperatorTok{&}\StringTok{ }\NormalTok{(MH))\{}
+        
+\NormalTok{        deno =}\StringTok{ }\KeywordTok{func_F}\NormalTok{(lambda_j, y_j, x_j, beta, sig2) }\OperatorTok{+}\StringTok{ }\KeywordTok{func_q}\NormalTok{(lambda[j], y_j, x_j, beta, }\KeywordTok{sqrt}\NormalTok{(sig2))}
+\NormalTok{        nume =}\StringTok{ }\KeywordTok{func_F}\NormalTok{(lambda[j], y_j, x_j, beta, sig2) }\OperatorTok{+}\StringTok{ }\KeywordTok{func_q}\NormalTok{(lambda_j, y_j, x_j, beta, }\KeywordTok{sqrt}\NormalTok{(sig2))}
+        
+\NormalTok{        log.rho =}\StringTok{ }\KeywordTok{min}\NormalTok{(}\DecValTok{0}\NormalTok{, nume}\OperatorTok{-}\NormalTok{deno)}
+        \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{log}\NormalTok{(}\KeywordTok{runif}\NormalTok{(}\DecValTok{1}\NormalTok{)) }\OperatorTok{<}\StringTok{ }\NormalTok{log.rho)\{}
+\NormalTok{          lambda[j] =}\StringTok{ }\NormalTok{lambda_j}
+\NormalTok{        \}}
+\NormalTok{      \} }
+      \ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (}\OperatorTok{!}\NormalTok{MH)}
+\NormalTok{      \{}
+\NormalTok{        lambda[j] =}\StringTok{ }\NormalTok{lambda_j}
+\NormalTok{      \}}
+\NormalTok{    \}}
+    
+    \CommentTok{# storing draws}
+    \ControlFlowTok{if}\NormalTok{(MH)}
+\NormalTok{    \{draws.mc[i,] =}\StringTok{ }\KeywordTok{c}\NormalTok{(sig2, beta)\}}
+    \ControlFlowTok{else}
+\NormalTok{    \{draws.gibbs[i,] =}\StringTok{ }\KeywordTok{c}\NormalTok{(sig2, beta)\}}
+    
+\NormalTok{  \}}
+  
+  \CommentTok{# Determine Execution Time}
+\NormalTok{  exec_time =}\StringTok{ }\NormalTok{tictoc}\OperatorTok{::}\KeywordTok{toc}\NormalTok{()}
+\NormalTok{  dt_time[k, }\StringTok{"Time"}\NormalTok{] =}\StringTok{ }\NormalTok{exec_time}\OperatorTok{$}\NormalTok{toc }\OperatorTok{-}\StringTok{ }\NormalTok{exec_time}\OperatorTok{$}\NormalTok{tic}
+  \KeywordTok{rm}\NormalTok{(}\DataTypeTok{list =} \KeywordTok{c}\NormalTok{(}\StringTok{"exec_time"}\NormalTok{))}
+  
+  \CommentTok{# Determine ESS}
+  \ControlFlowTok{if}\NormalTok{(MH)}
+\NormalTok{  \{}
+\NormalTok{    dt_time[k, }\StringTok{"ess"}\NormalTok{] =}\StringTok{ }\KeywordTok{round}\NormalTok{(M}\OperatorTok{/}\NormalTok{(}\DecValTok{1}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\KeywordTok{sum}\NormalTok{(}\KeywordTok{acf}\NormalTok{(draws.mc[,}\StringTok{"sigma"}\NormalTok{],}\DataTypeTok{lag.max=}\DecValTok{1000}\NormalTok{,}\DataTypeTok{plot=}\OtherTok{FALSE}\NormalTok{)}\OperatorTok{$}\NormalTok{acf[}\DecValTok{2}\OperatorTok{:}\DecValTok{1001}\NormalTok{])))}
+\NormalTok{  \}}
+  \ControlFlowTok{else}
+\NormalTok{  \{}
+\NormalTok{    dt_time[k, }\StringTok{"ess"}\NormalTok{] =}\StringTok{ }\KeywordTok{round}\NormalTok{(M}\OperatorTok{/}\NormalTok{(}\DecValTok{1}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\KeywordTok{sum}\NormalTok{(}\KeywordTok{acf}\NormalTok{(draws.gibbs[,}\StringTok{"sigma"}\NormalTok{],}\DataTypeTok{lag.max=}\DecValTok{1000}\NormalTok{,}\DataTypeTok{plot=}\OtherTok{FALSE}\NormalTok{)}\OperatorTok{$}\NormalTok{acf[}\DecValTok{2}\OperatorTok{:}\DecValTok{1001}\NormalTok{])))}
+\NormalTok{  \}}
+  
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## TRUE: 85.85 sec elapsed
+## FALSE: 47.59 sec elapsed
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Determine the ess per second}
+\NormalTok{dt_time}\OperatorTok{$}\NormalTok{ess_ps =}\StringTok{ }\NormalTok{dt_time}\OperatorTok{$}\NormalTok{ess }\OperatorTok{/}\StringTok{ }\NormalTok{dt_time}\OperatorTok{$}\NormalTok{Time}
+\end{Highlighting}
+\end{Shaded}
+
+We them print the distributions
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{draws2 =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(draws.mc[(M0}\OperatorTok{+}\DecValTok{1}\NormalTok{)}\OperatorTok{:}\NormalTok{niter,])}
+\KeywordTok{colnames}\NormalTok{(draws2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "sigma"  "beta.1" "beta.2" "beta.3" "beta.4"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(draws2}\OperatorTok{$}\NormalTok{sigma)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.5986  0.9145  1.0045  1.0172  1.1057  1.8359
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\KeywordTok{hist}\NormalTok{(draws2}\OperatorTok{$}\NormalTok{sigma, }\DataTypeTok{breaks =} \DecValTok{50}\NormalTok{, }\DataTypeTok{main=}\StringTok{"Histogram of Sigma"}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"Sigma"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Frequency"}\NormalTok{, }\DataTypeTok{xlim =} \KeywordTok{range}\NormalTok{(sigma_true, sigma2.ols, draws2}\OperatorTok{$}\NormalTok{sigma))}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v=}\NormalTok{sigma_true, }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v=}\NormalTok{sigma2.ols, }\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\KeywordTok{legend}\NormalTok{(}\StringTok{"bottom"}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\StringTok{"OLS"}\NormalTok{, }\StringTok{"TRUE"}\NormalTok{), }\DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{), }\DataTypeTok{lty=}\DecValTok{1}\NormalTok{)}
+\KeywordTok{acf}\NormalTok{(draws2}\OperatorTok{$}\NormalTok{sigma)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{TakeHome_MarkDown_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\KeywordTok{hist}\NormalTok{(draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.1}\NormalTok{, }\DataTypeTok{breaks =} \DecValTok{50}\NormalTok{, }\DataTypeTok{main=}\StringTok{"Histogram of beta_1"}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"beta_1"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Frequency"}\NormalTok{, }\DataTypeTok{xlim =} \KeywordTok{range}\NormalTok{(beta_true[}\DecValTok{1}\NormalTok{], beta.ols[}\DecValTok{1}\NormalTok{], draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.1}\NormalTok{))}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v =}\NormalTok{ beta_true[}\DecValTok{1}\NormalTok{], }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v =}\NormalTok{ beta.ols[}\DecValTok{1}\NormalTok{], }\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\KeywordTok{legend}\NormalTok{(}\StringTok{"bottom"}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\StringTok{"OLS"}\NormalTok{, }\StringTok{"TRUE"}\NormalTok{), }\DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{), }\DataTypeTok{lty=}\DecValTok{1}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.1}\NormalTok{, }\DataTypeTok{xlab=}\StringTok{"Iteration"}\NormalTok{, }\DataTypeTok{ylab=}\StringTok{"beta_1"}\NormalTok{,}\DataTypeTok{main=}\StringTok{"Interations"}\NormalTok{, }\DataTypeTok{type =} \StringTok{"l"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{TakeHome_MarkDown_files/figure-latex/unnamed-chunk-2-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\KeywordTok{hist}\NormalTok{(draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.2}\NormalTok{, }\DataTypeTok{breaks =} \DecValTok{50}\NormalTok{, }\DataTypeTok{main=}\StringTok{"Histogram of beta_2"}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"beta_2"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Frequency"}\NormalTok{, }\DataTypeTok{xlim =} \KeywordTok{range}\NormalTok{(beta_true[}\DecValTok{2}\NormalTok{], beta.ols[}\DecValTok{2}\NormalTok{], draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.2}\NormalTok{))}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v =}\NormalTok{ beta_true[}\DecValTok{2}\NormalTok{], }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v =}\NormalTok{ ols}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{], }\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\KeywordTok{legend}\NormalTok{(}\StringTok{"bottom"}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\StringTok{"OLS"}\NormalTok{, }\StringTok{"TRUE"}\NormalTok{), }\DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{), }\DataTypeTok{lty=}\DecValTok{1}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.2}\NormalTok{, }\DataTypeTok{xlab=}\StringTok{"Iteration"}\NormalTok{, }\DataTypeTok{ylab=}\StringTok{"beta_2"}\NormalTok{,}\DataTypeTok{main=}\StringTok{"Interations"}\NormalTok{, }\DataTypeTok{type =} \StringTok{"l"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{TakeHome_MarkDown_files/figure-latex/unnamed-chunk-2-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\KeywordTok{hist}\NormalTok{(draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.3}\NormalTok{, }\DataTypeTok{breaks =} \DecValTok{50}\NormalTok{, }\DataTypeTok{main=}\StringTok{"Histogram of beta_3"}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"beta_3"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Frequency"}\NormalTok{, }\DataTypeTok{xlim =} \KeywordTok{range}\NormalTok{(beta_true[}\DecValTok{3}\NormalTok{], beta.ols[}\DecValTok{3}\NormalTok{], draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.3}\NormalTok{))}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v =}\NormalTok{ beta_true[}\DecValTok{3}\NormalTok{], }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v =}\NormalTok{ ols}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{3}\NormalTok{], }\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\KeywordTok{legend}\NormalTok{(}\StringTok{"bottom"}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\StringTok{"OLS"}\NormalTok{, }\StringTok{"TRUE"}\NormalTok{), }\DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{), }\DataTypeTok{lty=}\DecValTok{1}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.3}\NormalTok{, }\DataTypeTok{xlab=}\StringTok{"Iteration"}\NormalTok{, }\DataTypeTok{ylab=}\StringTok{"beta_3"}\NormalTok{,}\DataTypeTok{main=}\StringTok{"Interations"}\NormalTok{, }\DataTypeTok{type =} \StringTok{"l"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{TakeHome_MarkDown_files/figure-latex/unnamed-chunk-2-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\KeywordTok{hist}\NormalTok{(draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.4}\NormalTok{, }\DataTypeTok{breaks =} \DecValTok{50}\NormalTok{, }\DataTypeTok{main=}\StringTok{"Histogram of beta_4"}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"beta_4"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"Frequency"}\NormalTok{, }\DataTypeTok{xlim =} \KeywordTok{range}\NormalTok{(beta_true[}\DecValTok{4}\NormalTok{], beta.ols[}\DecValTok{4}\NormalTok{], draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.4}\NormalTok{))}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v =}\NormalTok{ beta_true[}\DecValTok{4}\NormalTok{], }\DataTypeTok{col=}\StringTok{"red"}\NormalTok{)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{v =}\NormalTok{ ols}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{4}\NormalTok{], }\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\KeywordTok{legend}\NormalTok{(}\StringTok{"bottom"}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\StringTok{"OLS"}\NormalTok{, }\StringTok{"TRUE"}\NormalTok{), }\DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{), }\DataTypeTok{lty=}\DecValTok{1}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(draws2}\OperatorTok{$}\NormalTok{beta}\FloatTok{.3}\NormalTok{, }\DataTypeTok{xlab=}\StringTok{"Iteration"}\NormalTok{, }\DataTypeTok{ylab=}\StringTok{"beta_4"}\NormalTok{,}\DataTypeTok{main=}\StringTok{"Interations"}\NormalTok{, }\DataTypeTok{type =} \StringTok{"l"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{TakeHome_MarkDown_files/figure-latex/unnamed-chunk-2-5.pdf}
+
+Lastily we evaluate if MH perform better. We present the following
+table.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dt_time}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Method  Time   ess   ess_ps
+## 1     MH 85.85 46475 541.3512
+## 2  GIBBS 47.59  7443 156.3984
+\end{verbatim}
+
+\end{document}
